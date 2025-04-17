@@ -58,8 +58,8 @@ const Index = () => {
       <section className="bg-gray-50 py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-matepeak-primary">
-              Matepeak
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-matepeak-primary font-poppins">
+              Get the cheat codes from the pros
             </h1>
             <p className="text-xl text-gray-700 mb-8">
               No fluff. Just real lessons from real people.
