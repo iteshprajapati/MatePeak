@@ -28,6 +28,13 @@ export default {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+				mentor: {
+					primary: '#8B5CF6',
+					secondary: '#7E69AB',
+					tertiary: '#6E59A5',
+					light: '#E5DEFF',
+					dark: '#1A1F2C',
+				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
