@@ -62,14 +62,14 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
         </div>
         <Button
           onClick={handleSearch}
-          className="bg-mentor-primary hover:bg-mentor-secondary text-white"
+          className="bg-matepeak-dark hover:bg-matepeak-secondary text-white"
         >
           Search
         </Button>
         <Button
           variant="outline"
           onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          className="md:w-auto w-full flex items-center gap-2"
+          className="md:w-auto w-full flex items-center gap-2 border-gray-300"
         >
           <Filter size={16} />
           {isFiltersOpen ? "Hide Filters" : "Show Filters"}
@@ -130,7 +130,7 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
           <div className="mt-6 flex justify-end">
             <Button
               onClick={handleSearch}
-              className="bg-mentor-primary hover:bg-mentor-secondary text-white"
+              className="bg-matepeak-dark hover:bg-matepeak-secondary text-white"
             >
               Apply Filters
             </Button>

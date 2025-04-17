@@ -23,51 +23,44 @@ interface MentorCardProps {
 
 const MentorCard = ({ mentor }: MentorCardProps) => {
   return (
-    <div className="mentor-card">
-      <div className="p-6">
+    <div className="mentor-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden">
+      <div className="p-4">
         <div className="flex items-start gap-4">
           <img
             src={mentor.image}
             alt={mentor.name}
-            className="w-16 h-16 rounded-full object-cover border-2 border-mentor-light"
+            className="w-12 h-12 rounded-full object-cover border border-gray-200"
           />
           <div className="flex-1">
-            <h3 className="font-medium text-lg text-gray-900">{mentor.name}</h3>
+            <h3 className="font-medium text-gray-900">{mentor.name}</h3>
             <p className="text-gray-600 text-sm">{mentor.title}</p>
+            
             <div className="flex items-center mt-1">
               <div className="flex items-center">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="ml-1 text-sm font-medium">{mentor.rating}</span>
               </div>
-              <span className="mx-1.5 text-gray-500 text-sm">•</span>
-              <span className="text-sm text-gray-500">{mentor.reviewCount} reviews</span>
             </div>
-          </div>
-          <div className="text-right">
-            <div className="text-mentor-primary font-bold">₹{mentor.price}/hr</div>
           </div>
         </div>
         
-        <div className="mt-4 flex flex-wrap gap-2">
-          {mentor.categories.map((category, index) => (
-            <Badge key={index} variant="outline" className="bg-mentor-light text-mentor-primary border-mentor-light">
+        <div className="mt-3 flex flex-wrap gap-1">
+          {mentor.categories.slice(0, 4).map((category, index) => (
+            <Badge key={index} variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 text-xs">
               {category}
             </Badge>
           ))}
         </div>
         
-        <p className="mt-4 text-gray-600 text-sm line-clamp-2">{mentor.bio}</p>
+        <div className="mt-3 text-sm">
+          <span className="text-gray-700 font-medium">Full-time</span>
+        </div>
       </div>
       
-      <div className="border-t border-gray-100 px-6 py-4 flex justify-end">
+      <div className="px-4 pb-4 flex justify-end">
         <Link to={`/mentors/${mentor.id}`}>
-          <Button variant="outline" className="mr-2 border-mentor-primary text-mentor-primary hover:bg-mentor-light">
+          <Button variant="outline" className="rounded-full bg-matepeak-dark text-white hover:bg-matepeak-secondary">
             View Profile
-          </Button>
-        </Link>
-        <Link to={`/book/${mentor.id}`}>
-          <Button className="bg-mentor-primary hover:bg-mentor-secondary text-white">
-            Book Session
           </Button>
         </Link>
       </div>

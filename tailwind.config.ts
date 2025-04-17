@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -28,12 +29,12 @@ export default {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
-				mentor: {
-					primary: '#8B5CF6',
-					secondary: '#7E69AB',
-					tertiary: '#6E59A5',
-					light: '#E5DEFF',
-					dark: '#1A1F2C',
+				matepeak: {
+					primary: '#222222',
+					secondary: '#444444',
+					tertiary: '#666666',
+					light: '#F5F5F5',
+					dark: '#111111',
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -91,11 +92,22 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in-up': 'fade-in-up 0.6s ease-out'
 			}
 		}
 	},

@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,7 +103,7 @@
 
 @layer components {
   .gradient-heading {
-    @apply bg-gradient-to-r from-mentor-primary to-mentor-secondary bg-clip-text text-transparent;
+    @apply text-matepeak-primary font-bold;
   }
   
   .mentor-card {
@@ -110,11 +111,11 @@
   }
   
   .btn-primary {
-    @apply bg-mentor-primary hover:bg-mentor-secondary text-white font-medium rounded-lg transition-colors duration-200;
+    @apply bg-matepeak-primary hover:bg-matepeak-secondary text-white font-medium rounded-lg transition-colors duration-200;
   }
   
   .btn-secondary {
-    @apply bg-white border border-mentor-primary text-mentor-primary hover:bg-mentor-light font-medium rounded-lg transition-colors duration-200;
+    @apply bg-white border border-matepeak-primary text-matepeak-primary hover:bg-gray-100 font-medium rounded-lg transition-colors duration-200;
   }
   
   .section-padding {
