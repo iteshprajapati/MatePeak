@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -23,12 +22,10 @@ const MentorSearch = () => {
   });
 
   useEffect(() => {
-    // Initialize search query from URL parameters
     if (initialSearchTerm) {
       setSearchQuery(initialSearchTerm);
     }
     
-    // Apply initial filtering
     updateFilters({
       searchTerm: initialSearchTerm,
       categories: initialCategory ? [initialCategory] : [],
@@ -38,12 +35,16 @@ const MentorSearch = () => {
 
   const updateFilters = (filters: any) => {
     setSearchFilters(filters);
-    const filteredResults = filterMentors(
-      filters.searchTerm,
-      filters.categories,
-      filters.priceRange
-    );
-    setFilteredMentors(filteredResults);
+    if (filters.aiResults) {
+      setFilteredMentors(filters.aiResults);
+    } else {
+      const filteredResults = filterMentors(
+        filters.searchTerm,
+        filters.categories,
+        filters.priceRange
+      );
+      setFilteredMentors(filteredResults);
+    }
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useAISearch } from "@/hooks/useAISearch";
+import { toast } from "sonner";
 
 interface SearchFiltersProps {
   onSearch: (filters: any) => void;
@@ -16,6 +17,7 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { searchMentors, isLoading, error } = useAISearch();
 
   const categories = [
     { id: "academic", label: "Academic Support" },
@@ -33,12 +35,31 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
     );
   };
 
-  const handleSearch = () => {
-    onSearch({
-      searchTerm,
-      priceRange,
-      categories: selectedCategories,
-    });
+  const handleSearch = async () => {
+    if (searchTerm.trim()) {
+      try {
+        const results = await searchMentors(searchTerm);
+        onSearch({
+          searchTerm,
+          priceRange,
+          categories: selectedCategories,
+          aiResults: results
+        });
+      } catch (error) {
+        toast.error("Failed to perform AI search. Using standard search instead.");
+        onSearch({
+          searchTerm,
+          priceRange,
+          categories: selectedCategories
+        });
+      }
+    } else {
+      onSearch({
+        searchTerm,
+        priceRange,
+        categories: selectedCategories
+      });
+    }
   };
 
   const handleClearFilters = () => {
@@ -54,7 +75,7 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <Input
             type="text"
-            placeholder="Search by name, expertise, or keywords..."
+            placeholder="Search using AI - describe what you're looking for..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -63,8 +84,9 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
         <Button
           onClick={handleSearch}
           className="bg-matepeak-dark hover:bg-matepeak-secondary text-white"
+          disabled={isLoading}
         >
-          Search
+          {isLoading ? "Searching..." : "Search"}
         </Button>
         <Button
           variant="outline"

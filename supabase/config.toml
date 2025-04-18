@@ -1,1 +1,30 @@
+
+# project_id is required
 project_id = "xpusdfxewlhzjefloibl"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+
+[inbucket]
+enabled = true
+
+[studio]
+enabled = true
+
+[[functions]]
+name = "ai-search"
+verify_jwt = false
