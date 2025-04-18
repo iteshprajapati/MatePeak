@@ -1,12 +1,13 @@
 
-import { Star } from "lucide-react";
+import { Star, Phone, MessageSquare, Video, Users, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 
-// Define the MentorProfile type
+// Update the MentorProfile type to include connectionOptions
 export interface MentorProfile {
   id: string;
   name: string;
@@ -17,6 +18,7 @@ export interface MentorProfile {
   reviewCount: number;
   price: number;
   bio: string;
+  connectionOptions: string[];
 }
 
 interface MentorCardProps {
@@ -24,50 +26,93 @@ interface MentorCardProps {
 }
 
 const MentorCard = ({ mentor }: MentorCardProps) => {
-  // Get first letter of first and last name for avatar fallback
   const nameParts = mentor.name.split(' ');
   const initials = nameParts.length > 1 
     ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
     : mentor.name[0];
 
+  const getConnectionIcon = (option: string) => {
+    switch (option.toLowerCase()) {
+      case '1:1 call':
+        return <Phone className="h-4 w-4" />;
+      case 'chat':
+      case 'dm':
+        return <MessageSquare className="h-4 w-4" />;
+      case 'group session':
+        return <Users className="h-4 w-4" />;
+      case 'mock interview':
+        return <Video className="h-4 w-4" />;
+      case 'resume review':
+      case 'document review':
+        return <FileText className="h-4 w-4" />;
+      default:
+        return <MessageSquare className="h-4 w-4" />;
+    }
+  };
+
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
       <CardContent className="p-4">
-        {/* Top section with name and rating */}
-        <div className="flex items-start justify-between mb-2">
+        {/* Profile section with avatar and name */}
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border border-gray-200">
+            <Avatar className="h-16 w-16 border-2 border-gray-200">
               <AvatarImage src={mentor.image} alt={mentor.name} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div>
               <h3 className="font-medium text-gray-900">{mentor.name}</h3>
               <p className="text-gray-600 text-sm">{mentor.title}</p>
+              <div className="flex items-center mt-1">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="ml-1 text-sm font-medium">{mentor.rating}</span>
+                <span className="text-gray-500 text-sm ml-1">({mentor.reviewCount} reviews)</span>
+              </div>
             </div>
           </div>
-          
-          <div className="flex items-center">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="ml-1 text-sm font-medium">{mentor.rating}</span>
+          <div className="text-right">
+            <p className="font-semibold text-gray-900">₹{mentor.price}</p>
+            <p className="text-sm text-gray-500">per session</p>
           </div>
         </div>
-        
-        {/* Categories/tags section */}
-        <div className="mt-2 flex flex-wrap gap-1 mb-3">
-          {mentor.categories.slice(0, 4).map((category, index) => (
-            <Badge key={index} variant="outline" className="bg-gray-100 text-gray-700 border-gray-200 text-xs">
+
+        {/* Categories section */}
+        <div className="flex flex-wrap gap-1 mb-4">
+          {mentor.categories.map((category, index) => (
+            <Badge 
+              key={index} 
+              variant="outline" 
+              className="bg-gray-50 text-gray-700 border-gray-200 text-xs"
+            >
               {category}
             </Badge>
           ))}
         </div>
-        
-        {/* Bio section (replacing Full-time) */}
-        <div className="mt-3 text-sm">
-          <p className="text-gray-700">{mentor.bio.substring(0, 100)}{mentor.bio.length > 100 ? '...' : ''}</p>
+
+        {/* Connection options */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {mentor.connectionOptions.map((option, index) => (
+            <HoverCard key={index}>
+              <HoverCardTrigger>
+                <Badge 
+                  variant="outline" 
+                  className="bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                >
+                  <span className="flex items-center gap-1">
+                    {getConnectionIcon(option)}
+                    <span className="text-xs">{option}</span>
+                  </span>
+                </Badge>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                Available for {option}
+              </HoverCardContent>
+            </HoverCard>
+          ))}
         </div>
-        
+
         {/* View Profile button */}
-        <div className="mt-4 flex justify-end">
+        <div className="flex justify-end">
           <Link to={`/mentors/${mentor.id}`}>
             <Button variant="outline" className="rounded-full bg-matepeak-dark text-white hover:bg-matepeak-secondary">
               View Profile
