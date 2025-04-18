@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -34,15 +35,20 @@ const MentorSearch = () => {
   }, [initialSearchTerm, initialCategory]);
 
   const updateFilters = (filters: any) => {
+    console.log("Updating filters:", filters);
     setSearchFilters(filters);
+    
     if (filters.aiResults) {
+      console.log("Using AI search results:", filters.aiResults);
       setFilteredMentors(filters.aiResults);
     } else {
+      console.log("Using standard filtering with term:", filters.searchTerm);
       const filteredResults = filterMentors(
         filters.searchTerm,
         filters.categories,
         filters.priceRange
       );
+      console.log("Standard filter results:", filteredResults);
       setFilteredMentors(filteredResults);
     }
   };
@@ -76,7 +82,7 @@ const MentorSearch = () => {
           </div>
           
           {filteredMentors.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredMentors.map((mentor) => (
                 <MentorCard key={mentor.id} mentor={mentor} />
               ))}

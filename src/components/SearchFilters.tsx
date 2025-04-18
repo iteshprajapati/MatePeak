@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,14 +39,27 @@ const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
   const handleSearch = async () => {
     if (searchTerm.trim()) {
       try {
+        console.log("Initiating AI search for:", searchTerm);
         const results = await searchMentors(searchTerm);
-        onSearch({
-          searchTerm,
-          priceRange,
-          categories: selectedCategories,
-          aiResults: results
-        });
+        if (results && results.length > 0) {
+          toast.success(`Found ${results.length} mentors that match your search`);
+          onSearch({
+            searchTerm,
+            priceRange,
+            categories: selectedCategories,
+            aiResults: results
+          });
+        } else {
+          toast.info("No mentors found for your search. Try different keywords.");
+          onSearch({
+            searchTerm,
+            priceRange,
+            categories: selectedCategories,
+            aiResults: []
+          });
+        }
       } catch (error) {
+        console.error("Search error:", error);
         toast.error("Failed to perform AI search. Using standard search instead.");
         onSearch({
           searchTerm,
