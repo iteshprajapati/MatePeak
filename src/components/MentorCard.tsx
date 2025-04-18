@@ -51,22 +51,22 @@ const MentorCard = ({ mentor }: MentorCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
+    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 h-full">
       <CardContent className="p-4">
         {/* Profile section with avatar and name */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <Avatar className="h-16 w-16 border-2 border-gray-200">
-              <AvatarImage src={mentor.image} alt={mentor.name} />
+              <AvatarImage src={mentor.image} alt={mentor.name} className="object-cover" />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium text-gray-900">{mentor.name}</h3>
-              <p className="text-gray-600 text-sm">{mentor.title}</p>
+              <h3 className="font-medium text-gray-900 line-clamp-1">{mentor.name}</h3>
+              <p className="text-gray-600 text-sm line-clamp-1">{mentor.title}</p>
               <div className="flex items-center mt-1">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="ml-1 text-sm font-medium">{mentor.rating}</span>
-                <span className="text-gray-500 text-sm ml-1">({mentor.reviewCount} reviews)</span>
+                <span className="text-gray-500 text-sm ml-1">({mentor.reviewCount})</span>
               </div>
             </div>
           </div>
@@ -78,7 +78,7 @@ const MentorCard = ({ mentor }: MentorCardProps) => {
 
         {/* Categories section */}
         <div className="flex flex-wrap gap-1 mb-4">
-          {mentor.categories.map((category, index) => (
+          {mentor.categories.slice(0, 2).map((category, index) => (
             <Badge 
               key={index} 
               variant="outline" 

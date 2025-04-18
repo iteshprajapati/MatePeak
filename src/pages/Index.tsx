@@ -1,11 +1,10 @@
-
 import { useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, Calendar, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { mentors } from "@/data/mentors";
+import { mentors, getMentorsByCategory } from "@/data/mentors";
 import MentorCard from "@/components/MentorCard";
 import AnimatedSearchBar from "@/components/AnimatedSearchBar";
 import ContactForm from "@/components/ContactForm";
@@ -49,6 +48,14 @@ const Index = () => {
       });
     };
   }, []);
+  
+  const categories = [
+    "Recent Graduates",
+    "Academic Support",
+    "Mock Interviews",
+    "Resume Review",
+    "Health"
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -146,21 +153,40 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Featured Mentors */}
+      {/* Featured Mentors Sections */}
       <section className="py-16 bg-gray-50" ref={sectionRefs.mentors}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-matepeak-primary">Featured Mentors</h2>
+            <h2 className="text-3xl font-bold mb-4 text-matepeak-primary">Our Mentors</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Connect with our top-rated mentors who are ready to help you succeed.
+              Connect with our top-rated mentors across various categories who are ready to help you succeed.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredMentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
-            ))}
-          </div>
+          {categories.map((category) => {
+            const categoryMentors = mentors.filter(m => 
+              m.categories.includes(category)
+            ).slice(0, 4);
+
+            return (
+              <div key={category} className="mb-12">
+                <h3 className="text-2xl font-bold mb-6 text-gray-800">{category}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {categoryMentors.map((mentor) => (
+                    <MentorCard key={mentor.id} mentor={mentor} />
+                  ))}
+                </div>
+                <div className="text-center mt-6">
+                  <Link to={`/mentors?category=${encodeURIComponent(category)}`}>
+                    <Button variant="outline" className="border-matepeak-primary text-matepeak-primary hover:bg-gray-100">
+                      View All {category} Mentors
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
           
           <div className="text-center mt-12">
             <Link to="/mentors">
