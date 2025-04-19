@@ -121,6 +121,10 @@ export default function ExpertOnboarding() {
         return;
       }
       
+      // Convert availability array to a JSON string to store in the database
+      // This allows us to store the complex structure in a field that might expect simpler data
+      const availabilityJson = JSON.stringify(data.availability);
+      
       // Update user profile in database
       const { error } = await supabase
         .from('expert_profiles')
@@ -134,7 +138,7 @@ export default function ExpertOnboarding() {
             digitalProducts: data.digitalProducts,
             notes: data.notes,
           },
-          availability: data.availability,
+          availability_json: availabilityJson, // Store as JSON string
           isPaid: data.isPaid,
           hourly_rate: data.pricePerSession,
           bio: data.bio,
