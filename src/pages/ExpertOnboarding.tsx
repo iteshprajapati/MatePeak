@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/sonner";
@@ -30,7 +29,7 @@ export default function ExpertOnboarding() {
     try {
       await updateExpertProfile(data);
       toast.success("Profile created successfully!");
-      navigate(`/expert/dashboard`);
+      navigate("/expert/dashboard");
     } catch (error: any) {
       console.error("Error creating profile:", error);
       toast.error(error.message || "Failed to create profile");

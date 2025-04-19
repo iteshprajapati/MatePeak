@@ -2,9 +2,21 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleExpertClick = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate('/expert/dashboard');
+    } else {
+      navigate('/expert/login');
+    }
+  };
 
   return (
     <nav className="bg-matepeak-primary py-4 shadow-sm">
@@ -46,8 +58,11 @@ const Navbar = () => {
 
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button className="bg-white text-matepeak-primary hover:bg-gray-100 font-bold rounded-lg">
-            <Link to="/expert/signup">Become an Expert</Link>
+          <Button 
+            className="bg-white text-matepeak-primary hover:bg-gray-100 font-bold rounded-lg"
+            onClick={handleExpertClick}
+          >
+            Become an Expert
           </Button>
         </div>
 
