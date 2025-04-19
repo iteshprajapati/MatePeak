@@ -52,8 +52,8 @@ export default function PricingStep({ form }: { form: UseFormReturn<any> }) {
                     type="number"
                     placeholder="1000"
                     className="pl-8"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    value={field.value || ''}
+                    onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                   />
                 </div>
               </FormControl>

@@ -27,7 +27,7 @@ export async function updateExpertProfile(data: FormValues) {
         notes: data.notes,
       },
       availability_json: availabilityJson,
-      isPaid: data.isPaid,
+      ispaid: data.isPaid, // Using lowercase 'ispaid' to match the database column
       hourly_rate: data.pricePerSession,
       bio: data.bio,
       social_links: data.socialLinks,
