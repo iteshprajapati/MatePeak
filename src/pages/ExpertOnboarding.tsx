@@ -1,15 +1,10 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
 
 import { Form } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import OnboardingHeader from "@/components/onboarding/OnboardingHeader";
 import BasicInfoStep from "@/components/onboarding/BasicInfoStep";
 import ServiceTypesStep from "@/components/onboarding/ServiceTypesStep";
@@ -17,137 +12,23 @@ import AvailabilityStep from "@/components/onboarding/AvailabilityStep";
 import PricingStep from "@/components/onboarding/PricingStep";
 import ProfileSetupStep from "@/components/onboarding/ProfileSetupStep";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
-
-// Define the schema for each step
-const basicInfoSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be less than 30 characters")
-    .regex(/^[a-z0-9_-]+$/, "Username can only contain lowercase letters, numbers, underscores, and hyphens"),
-  category: z.string().min(1, "Please select a category"),
-});
-
-const serviceTypesSchema = z.object({
-  oneOnOneSession: z.boolean().optional(),
-  chatAdvice: z.boolean().optional(),
-  digitalProducts: z.boolean().optional(),
-  notes: z.boolean().optional(),
-});
-
-// Fix the availability schema to match the expected data structure
-const availabilitySchema = z.object({
-  availability: z.array(
-    z.object({
-      day: z.string(),
-      slots: z.array(
-        z.object({
-          start: z.string(),
-          end: z.string(),
-        })
-      ).optional(),
-    })
-  ).optional(),
-});
-
-const pricingSchema = z.object({
-  isPaid: z.boolean(),
-  pricePerSession: z.number().optional().nullable(),
-});
-
-const profileSetupSchema = z.object({
-  profilePicture: z.any().optional(),
-  bio: z.string().max(500, "Bio must be less than 500 characters"),
-  socialLinks: z.object({
-    linkedin: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
-    instagram: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
-    twitter: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
-  }).optional(),
-});
-
-// Combine all schemas
-const formSchema = z.object({
-  ...basicInfoSchema.shape,
-  ...serviceTypesSchema.shape,
-  ...availabilitySchema.shape,
-  ...pricingSchema.shape,
-  ...profileSetupSchema.shape,
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import StepNavigation from "@/components/onboarding/StepNavigation";
+import { useExpertOnboardingForm } from "@/hooks/useExpertOnboardingForm";
+import { updateExpertProfile } from "@/services/expertProfileService";
 
 export default function ExpertOnboarding() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const form = useExpertOnboardingForm();
   
   const totalSteps = 5;
   
-  // Create form with default values
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      fullName: "",
-      username: "",
-      category: "",
-      oneOnOneSession: false,
-      chatAdvice: false,
-      digitalProducts: false,
-      notes: false,
-      availability: [], // This is an array, not a boolean
-      isPaid: true, // This is a boolean
-      pricePerSession: 0,
-      bio: "",
-      socialLinks: {
-        linkedin: "",
-        instagram: "",
-        twitter: "",
-      },
-    },
-    mode: "onChange",
-  });
-  
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("You must be logged in to complete onboarding");
-        navigate("/expert/login");
-        return;
-      }
-      
-      // Convert availability array to a JSON string to store in the database
-      // This allows us to store the complex structure in a field that might expect simpler data
-      const availabilityJson = JSON.stringify(data.availability);
-      
-      // Update user profile in database
-      const { error } = await supabase
-        .from('expert_profiles')
-        .update({
-          full_name: data.fullName,
-          username: data.username,
-          category: data.category,
-          services: {
-            oneOnOneSession: data.oneOnOneSession,
-            chatAdvice: data.chatAdvice,
-            digitalProducts: data.digitalProducts,
-            notes: data.notes,
-          },
-          availability_json: availabilityJson, // Store as JSON string
-          isPaid: data.isPaid,
-          hourly_rate: data.pricePerSession,
-          bio: data.bio,
-          social_links: data.socialLinks,
-        })
-        .eq('id', user.id);
-      
-      if (error) throw error;
-      
+      await updateExpertProfile(data);
       toast.success("Profile created successfully!");
       navigate(`/expert/dashboard`);
     } catch (error: any) {
@@ -158,11 +39,9 @@ export default function ExpertOnboarding() {
     }
   };
   
-  // Handle specific validation for current step
   const handleNext = async () => {
     let isValid = false;
     
-    // Validate the current step
     try {
       switch (step) {
         case 1:
@@ -199,7 +78,6 @@ export default function ExpertOnboarding() {
     setStep(prev => Math.max(prev - 1, 1));
   };
   
-  // Render the current step
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -229,28 +107,13 @@ export default function ExpertOnboarding() {
             <form className="space-y-6">
               {renderStep()}
               
-              <div className="flex justify-between pt-6">
-                {step > 1 ? (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handleBack}
-                    disabled={isSubmitting}
-                  >
-                    Back
-                  </Button>
-                ) : (
-                  <div></div>
-                )}
-                
-                <Button 
-                  type="button" 
-                  onClick={handleNext}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Saving..." : step === totalSteps ? "Complete" : "Next"}
-                </Button>
-              </div>
+              <StepNavigation
+                currentStep={step}
+                totalSteps={totalSteps}
+                onBack={handleBack}
+                onNext={handleNext}
+                isSubmitting={isSubmitting}
+              />
             </form>
           </Form>
         </CardContent>
