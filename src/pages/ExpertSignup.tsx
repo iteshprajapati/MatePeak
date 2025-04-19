@@ -23,7 +23,7 @@ export default function ExpertSignup() {
     const expertise = formData.get("expertise") as string;
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -40,7 +40,13 @@ export default function ExpertSignup() {
       }
 
       toast.success("Account created successfully! Please check your email to confirm your account.");
-      navigate("/expert/login");
+      
+      // If user was created successfully, navigate to onboarding flow
+      if (data.user) {
+        navigate("/expert/onboarding");
+      } else {
+        navigate("/expert/login");
+      }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
     } finally {

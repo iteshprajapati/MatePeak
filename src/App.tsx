@@ -14,6 +14,7 @@ import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import ExpertSignup from "./pages/ExpertSignup";
 import ExpertLogin from "./pages/ExpertLogin";
+import ExpertOnboarding from "./pages/ExpertOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/expert/signup" element={<ExpertSignup />} />
           <Route path="/expert/login" element={<ExpertLogin />} />
+          <Route path="/expert/onboarding" element={<ExpertOnboarding />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
