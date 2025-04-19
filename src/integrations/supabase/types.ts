@@ -12,33 +12,51 @@ export type Database = {
       expert_profiles: {
         Row: {
           availability: boolean | null
+          availability_json: Json | null
           bio: string | null
+          category: string | null
           created_at: string
           expertise: string
           full_name: string
           hourly_rate: number | null
           id: string
+          ispaid: boolean | null
+          services: Json | null
+          social_links: Json | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           availability?: boolean | null
+          availability_json?: Json | null
           bio?: string | null
+          category?: string | null
           created_at?: string
           expertise: string
           full_name: string
           hourly_rate?: number | null
           id: string
+          ispaid?: boolean | null
+          services?: Json | null
+          social_links?: Json | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           availability?: boolean | null
+          availability_json?: Json | null
           bio?: string | null
+          category?: string | null
           created_at?: string
           expertise?: string
           full_name?: string
           hourly_rate?: number | null
           id?: string
+          ispaid?: boolean | null
+          services?: Json | null
+          social_links?: Json | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
