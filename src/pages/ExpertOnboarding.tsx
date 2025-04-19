@@ -36,6 +36,7 @@ const serviceTypesSchema = z.object({
   notes: z.boolean().optional(),
 });
 
+// Fix the availability schema to match the expected data structure
 const availabilitySchema = z.object({
   availability: z.array(
     z.object({
@@ -94,8 +95,8 @@ export default function ExpertOnboarding() {
       chatAdvice: false,
       digitalProducts: false,
       notes: false,
-      availability: [],
-      isPaid: true,
+      availability: [], // This is an array, not a boolean
+      isPaid: true, // This is a boolean
       pricePerSession: 0,
       bio: "",
       socialLinks: {
