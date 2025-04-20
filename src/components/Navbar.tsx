@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -24,14 +23,13 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/e73b1e4a-69e2-467b-9150-4c24460c908f.png" 
+            src="/lovable-uploads/14bf0eea-1bc9-4675-9231-356df10eb82d.png" 
             alt="MatePeak Logo"
             className="h-8 mr-2"
           />
           <span className="text-2xl font-bold font-poppins text-white">MatePeak</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/" className="text-white hover:text-gray-200 transition-colors relative group">
             Home
@@ -62,7 +60,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Auth Buttons */}
         <div className="hidden md:flex items-center space-x-4">
           <Button 
             className="bg-white text-matepeak-primary hover:bg-gray-100 font-bold rounded-lg"
@@ -82,7 +79,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-matepeak-primary py-4 px-4 mt-2 shadow-inner">
           <div className="flex flex-col space-y-4">
