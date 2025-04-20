@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
@@ -9,7 +8,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-lg font-bold mb-4 gradient-heading">SparkMentor</h3>
+            <div className="mb-4">
+              <img 
+                src="/lovable-uploads/b5453978-cecb-49b4-9519-4d389449e3c4.png" 
+                alt="MatePeak Logo" 
+                className="h-12"
+              />
+            </div>
             <p className="text-gray-600 mb-4">
               Connecting college students with the right mentors for personalized growth in academics, career, wellness, and more.
             </p>
@@ -100,7 +105,7 @@ const Footer = () => {
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-mentor-primary mr-3 mt-0.5" />
                 <span className="text-gray-600">
-                  SparkMentor, Bangalore, India
+                  MatePeak, Bangalore, India
                 </span>
               </li>
               <li className="flex items-center">
@@ -109,7 +114,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-mentor-primary mr-3" />
-                <span className="text-gray-600">support@sparkmentor.com</span>
+                <span className="text-gray-600">support@matepeak.com</span>
               </li>
             </ul>
           </div>
@@ -118,7 +123,7 @@ const Footer = () => {
         <div className="border-t border-gray-200 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 text-sm">
-              &copy; {new Date().getFullYear()} SparkMentor. All rights reserved.
+              &copy; {new Date().getFullYear()} MatePeak. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link to="/privacy" className="text-gray-600 text-sm hover:text-mentor-primary transition-colors">

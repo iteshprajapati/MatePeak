@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,7 +23,11 @@ const Navbar = () => {
     <nav className="bg-matepeak-primary py-4 shadow-sm">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold font-poppins text-white">MatePeak</span>
+          <img 
+            src="/lovable-uploads/2b7c1b08-70d4-4252-b2ed-62d8989b1195.png" 
+            alt="MatePeak Logo"
+            className="h-8"
+          />
         </Link>
 
         {/* Desktop Navigation */}
