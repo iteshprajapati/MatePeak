@@ -24,10 +24,11 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/2b7c1b08-70d4-4252-b2ed-62d8989b1195.png" 
+            src="/lovable-uploads/e73b1e4a-69e2-467b-9150-4c24460c908f.png" 
             alt="MatePeak Logo"
-            className="h-8"
+            className="h-8 mr-2"
           />
+          <span className="text-2xl font-bold font-poppins text-white">MatePeak</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -71,7 +72,6 @@ const Navbar = () => {
           </Button>
         </div>
 
-        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
