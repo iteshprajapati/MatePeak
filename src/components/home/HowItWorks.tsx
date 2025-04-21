@@ -1,18 +1,7 @@
 
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Search, CalendarDays, Users, ArrowRight } from "lucide-react";
-
-interface HowItWorksProps {
-  sectionRef: React.RefObject<HTMLDivElement>;
-}
+import React, { useState } from "react";
+import { Search, CalendarDays, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
@@ -20,29 +9,40 @@ const steps = [
     subtitle: "Browse Experts",
     description: "Discover top mentors by skill, domain, or passion.",
     icon: Search,
-    bg: "bg-[#D3E4FD]",
+    color: "from-[#D3E4FD] to-[#F1F0FB]",
   },
   {
     title: "Book a Session",
     subtitle: "Pick a Time",
     description: "Choose when and what you'd like to discuss.",
     icon: CalendarDays,
-    bg: "bg-[#F1F0FB]",
+    color: "from-[#F1F0FB] to-[#D3E4FD]",
   },
   {
     title: "Connect & Grow",
     subtitle: "Learn & Evolve",
     description: "Join your session and grow with guidance.",
     icon: Users,
-    bg: "bg-white",
+    color: "from-white to-[#F1F0FB]",
   },
 ];
 
-const HowItWorks = ({ sectionRef }: HowItWorksProps) => {
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
+const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement> }) => {
+  const [active, setActive] = useState(0);
+
+  const goLeft = () => setActive((prev) => mod(prev - 1, steps.length));
+  const goRight = () => setActive((prev) => mod(prev + 1, steps.length));
+
+  // For mobile swiper, handle swipe events if later desired
+
   return (
     <section
       ref={sectionRef}
-      className="py-16 md:py-24 bg-white"
+      className="py-16 md:py-24 bg-gradient-to-b from-[#f9fafd] via-[#f7f8fa] to-white"
     >
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
@@ -53,70 +53,122 @@ const HowItWorks = ({ sectionRef }: HowItWorksProps) => {
             Get mentorship in three easy steps—from browsing experts to growing your skills.
           </p>
         </div>
-        <div className="relative max-w-3xl mx-auto">
-          <Carousel opts={{ align: "center", loop: true }}>
-            <CarouselContent>
-              {steps.map((step, idx) => (
-                <CarouselItem
+        <div className="relative flex items-center justify-center mb-10 select-none overflow-visible">
+          <button
+            aria-label="Previous step"
+            onClick={goLeft}
+            className="z-10 absolute left-0 md:-left-12 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#edf4ff] focus:outline-none"
+          >
+            <svg width={22} height={22} viewBox="0 0 24 24" stroke="#888" fill="none"><path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <div className="flex w-full max-w-3xl items-center justify-center h-[340px] md:h-[280px] relative">
+            {[...Array(3)].map((_, i) => {
+              // -1: left, 0: center, 1: right (from active)
+              const stepIdx = mod(active + i - 1, steps.length);
+              let pos = i - 1; // -1, 0, 1
+
+              // Determine visual style based on position
+              const step = steps[stepIdx];
+              let scale = pos === 0 ? "scale-100" : "scale-90";
+              let blur = pos === 0 ? "blur-0" : "blur-[2.5px]";
+              let z = pos === 0 ? "z-10" : "z-0";
+              let opacity = pos === 0 ? "opacity-100" : "opacity-60";
+              let yTrans = pos === 0 ? "translate-y-0" : "translate-y-5";
+              let boxShadow =
+                pos === 0
+                  ? "shadow-xl"
+                  : "shadow-md";
+
+              return (
+                <div
                   key={step.title}
-                  className="md:basis-1/2 lg:basis-1/3 px-4"
+                  aria-hidden={pos !== 0}
+                  className={cn(
+                    "absolute transition-all duration-500 ease-in-out flex flex-col items-center w-5/6 md:w-2/5 max-w-md mx-auto cursor-default",
+                    scale,
+                    blur,
+                    z,
+                    opacity,
+                    yTrans,
+                    boxShadow
+                  )}
+                  style={{
+                    left:
+                      pos === -1
+                        ? "0%"
+                        : pos === 1
+                        ? "60%"
+                        : "30%",
+                  }}
                 >
                   <div
-                    className={
-                      `rounded-2xl shadow-lg ${step.bg} transition-shadow duration-300 flex flex-col items-center p-8 relative h-full group hover:shadow-xl`
-                    }
+                    className={cn(
+                      "w-full rounded-2xl bg-gradient-to-br",
+                      step.color,
+                      "p-8 md:p-10 flex flex-col items-center min-h-[260px] md:min-h-[220px] shadow-sm"
+                    )}
                   >
                     <div
-                      className={
-                        "w-16 h-16 rounded-full flex items-center justify-center shadow-sm mb-6 transition-transform duration-300 bg-white group-hover:scale-110"
-                      }
+                      className={cn(
+                        "w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 shadow group transition duration-300",
+                        "hover:scale-110"
+                      )}
                       style={{
                         boxShadow:
-                          "0 4px 16px 0 rgba(40,40,40,0.05), 0 1.5px 5px 0 rgba(120,120,160,0.07)",
+                          "0 4px 16px 0 rgba(40,40,40,0.06), 0 2px 8px 0 rgba(120,120,160,0.10)",
                       }}
                     >
-                      {/* Icon with subtle hover scale */}
                       <step.icon
                         size={36}
-                        className="text-matepeak-primary transition-transform duration-300 group-hover:scale-110"
+                        className="text-matepeak-primary transition-transform group-hover:scale-110"
                         strokeWidth={2.2}
                       />
                     </div>
                     <span className="uppercase text-xs text-matepeak-secondary font-medium tracking-widest mb-1 opacity-80">
                       {step.subtitle}
                     </span>
-                    <h3 className="text-xl md:text-2xl font-bold mb-2 text-matepeak-primary tracking-tight">
+                    <h3 className="text-2xl font-bold mb-2 text-matepeak-primary tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="text-gray-700 text-center text-base opacity-90">
+                    <p className="text-gray-700 text-center text-base opacity-90 font-normal">
                       {step.description}
                     </p>
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious aria-label="Previous Step" />
-            <CarouselNext aria-label="Next Step" />
-          </Carousel>
+                </div>
+              );
+            })}
+          </div>
+          <button
+            aria-label="Next step"
+            onClick={goRight}
+            className="z-10 absolute right-0 md:-right-12 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#edf4ff] focus:outline-none"
+          >
+            <svg width={22} height={22} viewBox="0 0 24 24" stroke="#888" fill="none"><path d="M9 6l6 6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
         </div>
-        <div className="text-center mt-12">
-          <Link to="/how-it-works">
-            <Button
-              variant="outline"
-              className="rounded-full border-matepeak-primary text-matepeak-primary font-semibold px-8 py-3 text-base group relative transition
-                before:absolute before:left-5 before:bottom-0 before:h-0.5 before:bg-matepeak-primary before:w-0 before:transition-all before:duration-300 group-hover:before:w-[85%]"
+        <div className="text-center mt-8">
+          <a href="/how-it-works">
+            <button
+              className="rounded-full border border-matepeak-primary text-matepeak-primary font-semibold px-8 py-3 text-base group relative transition bg-white hover:bg-[#f7faff] overflow-hidden"
               style={{
-                boxShadow:
-                  "0 1px 4px rgba(34,34,34,0.06)",
-                overflow: "hidden"
+                boxShadow: "0 1px 4px rgba(34,34,34,0.07)",
               }}
             >
               <span className="relative z-10 flex items-center">
                 Learn More About How It Works
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <svg
+                  className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.2}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M5 12h14M13 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </span>
-            </Button>
-          </Link>
+              <span className="absolute left-5 bottom-0 h-0.5 bg-matepeak-primary w-0 group-hover:w-[85%] transition-all duration-300"></span>
+            </button>
+          </a>
         </div>
       </div>
     </section>
