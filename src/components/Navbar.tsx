@@ -1,8 +1,8 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
@@ -14,7 +14,7 @@ const Navbar = () => {
     if (session) {
       navigate('/expert/dashboard');
     } else {
-      navigate('/expert/login');
+      navigate('/expert/signup');
     }
   };
 
@@ -31,38 +31,41 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-white hover:text-gray-200 transition-colors relative group">
+          <Link to="/" className="text-white hover:text-[#FFD966] transition-colors relative group">
             Home
-            <span className="absolute left-0 bottom-0 w-full h-0.5 bg-white transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
+            <span className="absolute left-0 bottom-0 w-full h-0.5 bg-[#FFD966] transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
           </Link>
           <div className="relative group">
-            <button className="flex items-center text-white hover:text-gray-200 transition-colors">
+            <button className="flex items-center text-white hover:text-[#FFD966] transition-colors">
               Category <ChevronDown className="ml-1 h-4 w-4 text-white" />
             </button>
-            <div className="absolute left-0 mt-2 w-48 bg-matepeak-primary rounded-md shadow-lg py-2 z-10 hidden group-hover:block">
-              <Link to="/mentors?category=academic" className="block px-4 py-2 text-white hover:bg-matepeak-secondary">
-                Academic Support
-              </Link>
-              <Link to="/mentors?category=career" className="block px-4 py-2 text-white hover:bg-matepeak-secondary">
-                Career Guidance
-              </Link>
-              <Link to="/mentors?category=wellness" className="block px-4 py-2 text-white hover:bg-matepeak-secondary">
-                Wellness & Fitness
-              </Link>
-              <Link to="/mentors?category=interview" className="block px-4 py-2 text-white hover:bg-matepeak-secondary">
-                Mock Interviews
-              </Link>
+            <div className="absolute left-0 mt-2 w-48 bg-matepeak-primary rounded-md shadow-lg py-2 z-10 hidden group-hover:block transition-all duration-300 hover:block" 
+                 style={{ transitionDelay: "0.2s" }}>
+              <div className="py-2 px-1">
+                <Link to="/mentors?category=academic" className="block px-4 py-2 text-white hover:bg-matepeak-secondary hover:text-[#FFD966] rounded-md mx-1">
+                  Academic Support
+                </Link>
+                <Link to="/mentors?category=career" className="block px-4 py-2 text-white hover:bg-matepeak-secondary hover:text-[#FFD966] rounded-md mx-1">
+                  Career Guidance
+                </Link>
+                <Link to="/mentors?category=wellness" className="block px-4 py-2 text-white hover:bg-matepeak-secondary hover:text-[#FFD966] rounded-md mx-1">
+                  Wellness & Fitness
+                </Link>
+                <Link to="/mentors?category=interview" className="block px-4 py-2 text-white hover:bg-matepeak-secondary hover:text-[#FFD966] rounded-md mx-1">
+                  Mock Interviews
+                </Link>
+              </div>
             </div>
           </div>
-          <Link to="/for-experts" className="text-white hover:text-gray-200 transition-colors relative group">
+          <Link to="/for-experts" className="text-white hover:text-[#FFD966] transition-colors relative group">
             For Experts
-            <span className="absolute left-0 bottom-0 w-full h-0.5 bg-white transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
+            <span className="absolute left-0 bottom-0 w-full h-0.5 bg-[#FFD966] transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
           </Link>
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
           <Button 
-            className="bg-white text-matepeak-primary hover:bg-gray-100 font-bold rounded-lg"
+            className="bg-white text-matepeak-primary hover:bg-[#FFD966] font-bold rounded-lg transition-colors duration-300"
             onClick={handleExpertClick}
           >
             Become an Expert
@@ -72,7 +75,7 @@ const Navbar = () => {
         <div className="md:hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white hover:text-gray-200"
+            className="text-white hover:text-[#FFD966]"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

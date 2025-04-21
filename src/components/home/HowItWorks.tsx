@@ -9,21 +9,21 @@ const steps = [
     subtitle: "Browse Experts",
     description: "Discover top mentors by skill, domain, or passion.",
     icon: Search,
-    color: "from-[#D3E4FD] to-[#F1F0FB]",
+    color: "from-[#FFFBEB] to-[#FFF8DC]",
   },
   {
     title: "Book a Session",
     subtitle: "Pick a Time",
     description: "Choose when and what you'd like to discuss.",
     icon: CalendarDays,
-    color: "from-[#F1F0FB] to-[#D3E4FD]",
+    color: "from-[#FFF8DC] to-[#FFFBEB]",
   },
   {
     title: "Connect & Grow",
     subtitle: "Learn & Evolve",
     description: "Join your session and grow with guidance.",
     icon: Users,
-    color: "from-white to-[#F1F0FB]",
+    color: "from-white to-[#FFFBEB]",
   },
 ];
 
@@ -36,8 +36,6 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
 
   const goLeft = () => setActive((prev) => mod(prev - 1, steps.length));
   const goRight = () => setActive((prev) => mod(prev + 1, steps.length));
-
-  // For mobile swiper, handle swipe events if later desired
 
   return (
     <section
@@ -57,7 +55,7 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
           <button
             aria-label="Previous step"
             onClick={goLeft}
-            className="z-10 absolute left-0 md:-left-12 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#edf4ff] focus:outline-none"
+            className="z-10 absolute left-2 md:left-0 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#FFFBEB] focus:outline-none"
           >
             <svg width={22} height={22} viewBox="0 0 24 24" stroke="#888" fill="none"><path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -69,11 +67,11 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
 
               // Determine visual style based on position
               const step = steps[stepIdx];
-              let scale = pos === 0 ? "scale-100" : "scale-90";
-              let blur = pos === 0 ? "blur-0" : "blur-[2.5px]";
+              let scale = pos === 0 ? "scale-100" : "scale-95";
+              let blur = pos === 0 ? "blur-0" : "blur-[1px]"; // reduced blur
               let z = pos === 0 ? "z-10" : "z-0";
-              let opacity = pos === 0 ? "opacity-100" : "opacity-60";
-              let yTrans = pos === 0 ? "translate-y-0" : "translate-y-5";
+              let opacity = pos === 0 ? "opacity-100" : "opacity-80"; // increased opacity
+              let yTrans = pos === 0 ? "translate-y-0" : "translate-y-3"; // reduced y-offset
               let boxShadow =
                 pos === 0
                   ? "shadow-xl"
@@ -95,9 +93,9 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
                   style={{
                     left:
                       pos === -1
-                        ? "0%"
+                        ? "5%"
                         : pos === 1
-                        ? "60%"
+                        ? "55%"
                         : "30%",
                   }}
                 >
@@ -141,7 +139,7 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
           <button
             aria-label="Next step"
             onClick={goRight}
-            className="z-10 absolute right-0 md:-right-12 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#edf4ff] focus:outline-none"
+            className="z-10 absolute right-2 md:right-0 top-1/2 -translate-y-1/2 bg-white shadow-md border border-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition hover:bg-[#FFFBEB] focus:outline-none"
           >
             <svg width={22} height={22} viewBox="0 0 24 24" stroke="#888" fill="none"><path d="M9 6l6 6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -149,7 +147,7 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
         <div className="text-center mt-8">
           <a href="/how-it-works">
             <button
-              className="rounded-full border border-matepeak-primary text-matepeak-primary font-semibold px-8 py-3 text-base group relative transition bg-white hover:bg-[#f7faff] overflow-hidden"
+              className="rounded-full border border-matepeak-primary text-matepeak-primary font-semibold px-8 py-3 text-base group relative transition bg-white hover:bg-[#FFFBEB] overflow-hidden"
               style={{
                 boxShadow: "0 1px 4px rgba(34,34,34,0.07)",
               }}
@@ -166,7 +164,7 @@ const HowItWorks = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement
                   <path d="M5 12h14M13 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              <span className="absolute left-5 bottom-0 h-0.5 bg-matepeak-primary w-0 group-hover:w-[85%] transition-all duration-300"></span>
+              <span className="absolute left-5 bottom-0 h-0.5 bg-[#FFD966] w-0 group-hover:w-[85%] transition-all duration-300"></span>
             </button>
           </a>
         </div>

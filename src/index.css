@@ -102,6 +102,10 @@
 }
 
 @layer components {
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-matepeak-primary via-[#FFD966] to-matepeak-primary bg-size-200 animate-gradient-x;
+  }
+  
   .gradient-heading {
     @apply text-matepeak-primary font-bold;
   }
@@ -121,4 +125,27 @@
   .section-padding {
     @apply py-12 md:py-20;
   }
+}
+
+/* Background size and animation utilities */
+.bg-size-200 {
+  background-size: 200% 200%;
+}
+
+.animate-gradient-x {
+  animation: gradient-x 5s ease infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Add focus styles for form elements */
+.focus-visible:ring-brand {
+  --tw-ring-color: #FFD966;
 }
