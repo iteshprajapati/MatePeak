@@ -21,8 +21,10 @@ export type Database = {
           expert_id: string
           id: string
           message: string | null
+          payment_status: string | null
           scheduled_date: string
           scheduled_time: string
+          session_time: string | null
           session_type: string
           status: string | null
           total_amount: number | null
@@ -35,8 +37,10 @@ export type Database = {
           expert_id: string
           id?: string
           message?: string | null
+          payment_status?: string | null
           scheduled_date: string
           scheduled_time: string
+          session_time?: string | null
           session_type: string
           status?: string | null
           total_amount?: number | null
@@ -49,8 +53,10 @@ export type Database = {
           expert_id?: string
           id?: string
           message?: string | null
+          payment_status?: string | null
           scheduled_date?: string
           scheduled_time?: string
+          session_time?: string | null
           session_type?: string
           status?: string | null
           total_amount?: number | null
@@ -97,10 +103,11 @@ export type Database = {
           bio: string | null
           category: string
           created_at: string | null
+          experience: number | null
           full_name: string
-          hourly_rate: number | null
           id: string
           ispaid: boolean | null
+          pricing: number | null
           services: Json | null
           social_links: Json | null
           updated_at: string | null
@@ -111,10 +118,11 @@ export type Database = {
           bio?: string | null
           category: string
           created_at?: string | null
+          experience?: number | null
           full_name: string
-          hourly_rate?: number | null
           id: string
           ispaid?: boolean | null
+          pricing?: number | null
           services?: Json | null
           social_links?: Json | null
           updated_at?: string | null
@@ -125,10 +133,11 @@ export type Database = {
           bio?: string | null
           category?: string
           created_at?: string | null
+          experience?: number | null
           full_name?: string
-          hourly_rate?: number | null
           id?: string
           ispaid?: boolean | null
+          pricing?: number | null
           services?: Json | null
           social_links?: Json | null
           updated_at?: string | null
@@ -181,6 +190,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          role: string | null
           updated_at: string | null
         }
         Insert: {
@@ -189,6 +199,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          role?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -197,6 +208,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          role?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -275,6 +287,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_mentor_availability: {
+        Args: {
+          p_duration?: number
+          p_mentor_id: string
+          p_session_time: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
