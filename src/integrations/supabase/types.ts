@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      expert_profiles: {
+        Row: {
+          availability_json: string | null
+          bio: string | null
+          category: string
+          created_at: string | null
+          full_name: string
+          hourly_rate: number | null
+          id: string
+          ispaid: boolean | null
+          services: Json | null
+          social_links: Json | null
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          availability_json?: string | null
+          bio?: string | null
+          category: string
+          created_at?: string | null
+          full_name: string
+          hourly_rate?: number | null
+          id: string
+          ispaid?: boolean | null
+          services?: Json | null
+          social_links?: Json | null
+          updated_at?: string | null
+          username: string
+        }
+        Update: {
+          availability_json?: string | null
+          bio?: string | null
+          category?: string
+          created_at?: string | null
+          full_name?: string
+          hourly_rate?: number | null
+          id?: string
+          ispaid?: boolean | null
+          services?: Json | null
+          social_links?: Json | null
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
