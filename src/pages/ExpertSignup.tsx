@@ -30,12 +30,28 @@ export default function ExpertSignup() {
           data: {
             full_name: fullName,
             expertise: expertise,
-          },
+            role: 'mentor'
+          }
         },
       });
 
       if (error) {
-        toast.error(error.message);
+        console.error('Signup error:', error);
+        
+        // Handle specific error cases with better messages
+        if (error.message.includes('fetch')) {
+          toast.error("Connection error. Please check your internet connection and try again.");
+        } else if (error.message.includes('User already registered')) {
+          toast.error("An account with this email already exists. Please try logging in.");
+        } else if (error.message.includes('Invalid email')) {
+          toast.error("Please enter a valid email address.");
+        } else if (error.message.includes('Password')) {
+          toast.error("Password must be at least 6 characters long.");
+        } else if (error.message.includes('rate limit') || error.message.includes('too many')) {
+          toast.error("Too many attempts. Please wait a moment and try again.");
+        } else {
+          toast.error(error.message || "Failed to create account. Please try again.");
+        }
         return;
       }
 
@@ -47,8 +63,17 @@ export default function ExpertSignup() {
       } else {
         navigate("/expert/login");
       }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.");
+    } catch (error: any) {
+      console.error('Unexpected error during signup:', error);
+      
+      // Handle network and other errors
+      if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('network'))) {
+        toast.error("Unable to connect to server. Please check your internet connection.");
+      } else if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
