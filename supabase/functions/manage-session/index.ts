@@ -121,14 +121,26 @@ Deno.serve(async (req) => {
         )
     }
 
+    // Generate meet link for confirmed sessions
+    const meetLink = action === 'confirm' 
+      ? `https://meet.matepeak.com/${session_id.substring(0, 8)}` 
+      : undefined;
+
     // Update the booking
+    const updateData: any = {
+      status: newStatus,
+      payment_status: newPaymentStatus,
+      updated_at: new Date().toISOString()
+    };
+
+    // Add meet link to message for now (until meet_link column is added)
+    if (meetLink && action === 'confirm') {
+      updateData.message = (booking.message || '') + `\n\nMeet Link: ${meetLink}`;
+    }
+
     const { data: updatedBooking, error: updateError } = await supabaseClient
       .from('bookings')
-      .update({
-        status: newStatus,
-        payment_status: newPaymentStatus,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', session_id)
       .select('*, expert:expert_profiles(full_name, category)')
       .single()

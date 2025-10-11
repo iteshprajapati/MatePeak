@@ -1,362 +1,119 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
-
-const openAiKey = Deno.env.get('OPENAI_API_KEY')
-const supabaseUrl = 'https://xpusdfxewlhzjefloibl.supabase.co'
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { query } = await req.json()
-    console.log("Search query received:", query)
+    const { query, limit = 10 } = await req.json();
     
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    if (!query) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Query is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const openAIKey = Deno.env.get('OPENAI_API_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    // Get all mentors from the database - use mock data for now
-    // In a production app, this would fetch from a real database table
-    const mentors = await getMentorData();
-    console.log(`Found ${mentors.length} mentors to search through`)
-    
-    // Use OpenAI to analyze the query and find relevant mentors
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    if (!openAIKey) {
+      throw new Error('OPENAI_API_KEY not configured');
+    }
+
+    console.log('Generating embedding for query:', query);
+
+    // Generate embedding for search query
+    const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAiKey}`,
+        'Authorization': `Bearer ${openAIKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a search assistant helping to match mentors with user queries. Analyze the mentors data and the user query to find the most relevant matches.'
-          },
-          {
-            role: 'user',
-            content: `User Query: "${query}"\n\nMentors Data: ${JSON.stringify(mentors)}\n\nReturn only the IDs of the most relevant mentors as a JSON array, for example: ["1", "5", "9"]. Make sure to only return valid IDs that exist in the data.`
-          }
-        ],
-        temperature: 0.5,
+        model: 'text-embedding-3-small',
+        input: query,
       }),
-    })
+    });
 
-    const aiResult = await openAIResponse.json()
-    console.log("AI response:", JSON.stringify(aiResult))
-    
-    // Safely extract the content and parse the JSON
-    let relevantMentorIds = [];
-    if (aiResult && aiResult.choices && aiResult.choices.length > 0) {
-      const content = aiResult.choices[0].message.content;
-      try {
-        // Parse the response content - handle different possible formats
-        if (content.includes('[') && content.includes(']')) {
-          const jsonStr = content.substring(
-            content.indexOf('['),
-            content.lastIndexOf(']') + 1
-          );
-          relevantMentorIds = JSON.parse(jsonStr);
-        } else {
-          console.log("Unexpected AI response format:", content);
-          // If AI response format is unexpected, fall back to a basic search
-          relevantMentorIds = mentors
-            .filter(m => 
-              m.name.toLowerCase().includes(query.toLowerCase()) || 
-              m.title.toLowerCase().includes(query.toLowerCase()) ||
-              m.categories.some(c => c.toLowerCase().includes(query.toLowerCase()))
-            )
-            .map(m => m.id);
-        }
-      } catch (error) {
-        console.error("Error parsing AI response:", error);
-        // Fallback to simple filtering
-        relevantMentorIds = mentors
-          .filter(m => 
-            m.name.toLowerCase().includes(query.toLowerCase()) || 
-            m.title.toLowerCase().includes(query.toLowerCase()) ||
-            m.categories.some(c => c.toLowerCase().includes(query.toLowerCase()))
-          )
-          .map(m => m.id);
-      }
+    if (!embeddingResponse.ok) {
+      const error = await embeddingResponse.text();
+      console.error('OpenAI API error:', error);
+      throw new Error('Failed to generate embedding');
     }
-    
-    console.log("Relevant mentor IDs:", relevantMentorIds);
-    
-    // Filter mentors based on the relevant IDs
-    const filteredMentors = mentors.filter(mentor => 
-      relevantMentorIds.includes(mentor.id)
+
+    const embeddingData = await embeddingResponse.json();
+    const queryEmbedding = embeddingData.data[0].embedding;
+
+    console.log('Searching for similar mentors...');
+
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Search for similar mentors using vector similarity
+    const { data: similarMentors, error: searchError } = await supabase.rpc(
+      'search_mentors',
+      {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.7,
+        match_count: limit
+      }
     );
-    
-    console.log(`Returning ${filteredMentors.length} mentors as results`);
-    
+
+    if (searchError) {
+      console.error('Search error:', searchError);
+      
+      // Fallback to regular search if vector search fails
+      const { data: fallbackMentors, error: fallbackError } = await supabase
+        .from('expert_profiles')
+        .select(`
+          *,
+          profile:profiles(full_name, email, avatar_url),
+          reviews(rating)
+        `)
+        .ilike('bio', `%${query}%`)
+        .limit(limit);
+
+      if (fallbackError) {
+        throw fallbackError;
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: fallbackMentors || [],
+          fallback: true,
+          message: 'AI search not available, showing keyword results'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Found', similarMentors?.length || 0, 'mentors');
+
     return new Response(
-      JSON.stringify({ mentors: filteredMentors }),
+      JSON.stringify({
+        success: true,
+        data: similarMentors || [],
+        fallback: false
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    console.error('Error:', error);
+
+  } catch (error: any) {
+    console.error('Error in ai-search:', error);
     return new Response(
-      JSON.stringify({ error: error.message, mentors: [] }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
-
-// Helper function to get mentor data
-async function getMentorData() {
-  return [
-    {
-      id: "1",
-      name: "Aisha Patel",
-      title: "Senior @ IIT Delhi | Computer Science",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      categories: ["Recent Graduates", "Programming", "Peer Mentoring"],
-      rating: 4.9,
-      reviewCount: 45,
-      price: 499,
-      bio: "Final year Computer Science student helping juniors with academics and placement preparation.",
-      connectionOptions: ["1:1 Call", "Chat", "Mock Interview"]
-    },
-    {
-      id: "2",
-      name: "Raj Kumar",
-      title: "Senior @ BITS Pilani | Mechanical",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-      categories: ["Recent Graduates", "Engineering", "Project Guidance"],
-      rating: 4.7,
-      reviewCount: 38,
-      price: 399,
-      bio: "Helping juniors with project selection and implementation.",
-      connectionOptions: ["1:1 Call", "Chat", "Document Review"]
-    },
-    {
-      id: "3",
-      name: "Sneha Singh",
-      title: "Senior @ VIT Vellore | Electronics",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-      categories: ["Recent Graduates", "Electronics", "Career Guidance"],
-      rating: 4.8,
-      reviewCount: 42,
-      price: 449,
-      bio: "Helping students with electronics projects and internship preparation.",
-      connectionOptions: ["1:1 Call", "Group Session", "Mock Interview"]
-    },
-    {
-      id: "4",
-      name: "Arjun Reddy",
-      title: "Senior @ IIIT Hyderabad | Data Science",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-      categories: ["Recent Graduates", "Data Science", "Programming"],
-      rating: 4.8,
-      reviewCount: 35,
-      price: 549,
-      bio: "Guiding juniors in data science projects and placements.",
-      connectionOptions: ["1:1 Call", "Chat", "Document Review"]
-    },
-    {
-      id: "5",
-      name: "Dr. Meera Desai",
-      title: "PhD in Mathematics | IISc",
-      image: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb",
-      categories: ["Academic Support", "Mathematics", "Research"],
-      rating: 4.9,
-      reviewCount: 89,
-      price: 1299,
-      bio: "Mathematics expert specializing in advanced calculus and numerical methods.",
-      connectionOptions: ["1:1 Call", "Group Session", "Doubt Solving"]
-    },
-    {
-      id: "6",
-      name: "Prof. Ramesh Kumar",
-      title: "Professor @ IIT Bombay",
-      image: "https://images.unsplash.com/photo-1531384441138-2736e62e0919",
-      categories: ["Academic Support", "Physics", "Engineering"],
-      rating: 4.7,
-      reviewCount: 167,
-      price: 999,
-      bio: "Experienced professor helping students master complex physics concepts.",
-      connectionOptions: ["1:1 Call", "Group Session", "Notes"]
-    },
-    {
-      id: "7",
-      name: "Dr. Anjali Sharma",
-      title: "Professor @ Delhi University",
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e",
-      categories: ["Academic Support", "Chemistry", "Research"],
-      rating: 4.8,
-      reviewCount: 124,
-      price: 899,
-      bio: "Chemistry expert specializing in organic chemistry and research guidance.",
-      connectionOptions: ["1:1 Call", "Lab Guidance", "Doubt Solving"]
-    },
-    {
-      id: "8",
-      name: "Prof. Suresh Iyer",
-      title: "HOD @ NIT Trichy",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-      categories: ["Academic Support", "Computer Science", "Research"],
-      rating: 4.9,
-      reviewCount: 156,
-      price: 1199,
-      bio: "Computer Science professor specializing in algorithms and system design.",
-      connectionOptions: ["1:1 Call", "Project Review", "Research Guidance"]
-    },
-    {
-      id: "9",
-      name: "Vikram Malhotra",
-      title: "Senior SDE @ Google",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7",
-      categories: ["Mock Interviews", "Technical", "Career Guidance"],
-      rating: 4.9,
-      reviewCount: 234,
-      price: 1999,
-      bio: "Tech interview expert with 8+ years of interviewing experience.",
-      connectionOptions: ["Mock Interview", "Resume Review", "1:1 Call"]
-    },
-    {
-      id: "10",
-      name: "Priya Mehta",
-      title: "HR Manager @ Microsoft",
-      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f",
-      categories: ["Mock Interviews", "HR", "Career Guidance"],
-      rating: 4.8,
-      reviewCount: 189,
-      price: 1499,
-      bio: "HR professional helping candidates ace behavioral interviews.",
-      connectionOptions: ["Mock Interview", "Resume Review", "Interview Prep"]
-    },
-    {
-      id: "11",
-      name: "Rahul Verma",
-      title: "Product Manager @ Amazon",
-      image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce",
-      categories: ["Mock Interviews", "Product", "Career Guidance"],
-      rating: 4.9,
-      reviewCount: 167,
-      price: 1799,
-      bio: "Product interview expert with experience in FAANG companies.",
-      connectionOptions: ["Mock Interview", "Case Study Prep", "1:1 Call"]
-    },
-    {
-      id: "12",
-      name: "Neha Singh",
-      title: "Tech Lead @ Netflix",
-      image: "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56",
-      categories: ["Mock Interviews", "System Design", "Career Guidance"],
-      rating: 4.8,
-      reviewCount: 145,
-      price: 1899,
-      bio: "System design and architecture interview specialist.",
-      connectionOptions: ["Mock Interview", "System Design", "Code Review"]
-    },
-    {
-      id: "13",
-      name: "Karthik Raman",
-      title: "Career Coach | Ex-LinkedIn",
-      image: "https://images.unsplash.com/photo-1556157382-97eda2d62296",
-      categories: ["Resume Review", "Career Guidance"],
-      rating: 4.9,
-      reviewCount: 278,
-      price: 999,
-      bio: "Professional resume writer with expertise in tech and business profiles.",
-      connectionOptions: ["Resume Review", "LinkedIn Review", "1:1 Call"]
-    },
-    {
-      id: "14",
-      name: "Anita Desai",
-      title: "Talent Acquisition | Ex-IBM",
-      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
-      categories: ["Resume Review", "Career Guidance"],
-      rating: 4.8,
-      reviewCount: 234,
-      price: 899,
-      bio: "Helping candidates create impactful resumes that stand out.",
-      connectionOptions: ["Resume Review", "Cover Letter", "Profile Review"]
-    },
-    {
-      id: "15",
-      name: "Sanjay Gupta",
-      title: "Career Strategist | IIM-A",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7",
-      categories: ["Resume Review", "Career Guidance", "MBA"],
-      rating: 4.9,
-      reviewCount: 189,
-      price: 1299,
-      bio: "MBA admissions and career transition resume expert.",
-      connectionOptions: ["Resume Review", "SoP Review", "Strategy Call"]
-    },
-    {
-      id: "16",
-      name: "Maya Krishnan",
-      title: "Technical Resume Expert",
-      image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604",
-      categories: ["Resume Review", "Technical", "Career Guidance"],
-      rating: 4.8,
-      reviewCount: 156,
-      price: 799,
-      bio: "Specializing in technical resume optimization for software roles.",
-      connectionOptions: ["Resume Review", "GitHub Review", "Portfolio Review"]
-    },
-    {
-      id: "17",
-      name: "Dr. Sanya Kapoor",
-      title: "Mental Health Counselor",
-      image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
-      categories: ["Health", "Mental Wellness"],
-      rating: 4.9,
-      reviewCount: 189,
-      price: 899,
-      bio: "Licensed counselor helping students manage academic stress.",
-      connectionOptions: ["1:1 Call", "Group Session", "Chat Support"]
-    },
-    {
-      id: "18",
-      name: "Rohit Mehta",
-      title: "Fitness Coach & Nutritionist",
-      image: "https://images.unsplash.com/photo-1548372290-8d01b6c8e78c",
-      categories: ["Health", "Fitness", "Nutrition"],
-      rating: 4.8,
-      reviewCount: 167,
-      price: 799,
-      bio: "Helping students maintain a healthy lifestyle during academics.",
-      connectionOptions: ["1:1 Call", "Diet Plan", "Workout Plan"]
-    },
-    {
-      id: "19",
-      name: "Dr. Priya Sharma",
-      title: "Wellness Coach | Yoga Expert",
-      image: "https://images.unsplash.com/photo-1594381898411-846e7d193883",
-      categories: ["Health", "Yoga", "Meditation"],
-      rating: 4.9,
-      reviewCount: 145,
-      price: 699,
-      bio: "Yoga and meditation expert for stress management.",
-      connectionOptions: ["1:1 Session", "Group Class", "Meditation Guide"]
-    },
-    {
-      id: "20",
-      name: "Dr. Arjun Singh",
-      title: "Sports Physiotherapist",
-      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d",
-      categories: ["Health", "Sports", "Fitness"],
-      rating: 4.8,
-      reviewCount: 134,
-      price: 999,
-      bio: "Sports injury prevention and rehabilitation specialist.",
-      connectionOptions: ["1:1 Session", "Injury Assessment", "Recovery Plan"]
-    }
-  ];
-}

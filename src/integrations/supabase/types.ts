@@ -302,6 +302,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_mentors_text: {
+        Args: { match_count?: number; search_query: string }
+        Returns: {
+          availability_json: string
+          bio: string
+          category: string
+          created_at: string
+          experience: number
+          full_name: string
+          id: string
+          ispaid: boolean
+          pricing: number
+          profile: Json
+          reviews: Json
+          services: Json
+          social_links: Json
+          updated_at: string
+          user_id: string
+          username: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "expert" | "user"
