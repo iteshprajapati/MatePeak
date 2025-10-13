@@ -12,7 +12,9 @@ import BookingSuccess from "./pages/BookingSuccess";
 import Dashboard from "./pages/Dashboard";
 import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
-import ExpertSignup from "./pages/ExpertSignup";
+import RoleSelection from "./pages/RoleSelection";
+import StudentSignup from "./pages/StudentSignup";
+import MentorSignup from "./pages/MentorSignup";
 import ExpertLogin from "./pages/ExpertLogin";
 import ExpertOnboarding from "./pages/ExpertOnboarding";
 import ExpertDashboard from "./pages/ExpertDashboard";
@@ -33,7 +35,10 @@ const App = () => (
           <Route path="/booking-success" element={<BookingSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/expert/signup" element={<ExpertSignup />} />
+          <Route path="/signup" element={<RoleSelection />} />
+          <Route path="/student/signup" element={<StudentSignup />} />
+          <Route path="/mentor/signup" element={<MentorSignup />} />
+          <Route path="/expert/signup" element={<MentorSignup />} />
           <Route path="/expert/login" element={<ExpertLogin />} />
           <Route path="/expert/onboarding" element={<ExpertOnboarding />} />
           <Route path="/expert/dashboard" element={<ExpertDashboard />} />

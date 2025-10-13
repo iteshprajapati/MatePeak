@@ -14,7 +14,7 @@ const Navbar = () => {
     if (session) {
       navigate('/expert/dashboard');
     } else {
-      navigate('/expert/signup');
+      navigate('/signup');
     }
   };
 

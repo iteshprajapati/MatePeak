@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
 
-export default function ExpertSignup() {
+export default function MentorSignup() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,10 +23,13 @@ export default function ExpertSignup() {
     const expertise = formData.get("expertise") as string;
 
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
             expertise: expertise,
@@ -81,8 +84,8 @@ export default function ExpertSignup() {
 
   return (
     <AuthLayout
-      title="Create an Expert Account"
-      description="Join MatePeak as an expert mentor"
+      title="Create a Mentor Account"
+      description="Share your expertise and help students succeed"
       footer="Already have an account?"
       footerLink="/expert/login"
       footerLinkText="Sign in"
@@ -132,6 +135,12 @@ export default function ExpertSignup() {
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
+      <p className="text-center mt-4 text-sm text-gray-600">
+        Want to join as a student?{" "}
+        <a href="/student/signup" className="text-matepeak-primary hover:underline font-medium">
+          Sign up as student
+        </a>
+      </p>
     </AuthLayout>
   );
 }
