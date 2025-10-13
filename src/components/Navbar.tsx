@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import RoleSelectionModal from "./RoleSelectionModal";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleGetStartedClick = async () => {
@@ -14,7 +16,7 @@ const Navbar = () => {
     if (session) {
       navigate('/expert/dashboard');
     } else {
-      navigate('/signup');
+      setIsRoleModalOpen(true);
     }
   };
 
@@ -85,6 +87,11 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      <RoleSelectionModal 
+        open={isRoleModalOpen} 
+        onOpenChange={setIsRoleModalOpen} 
+      />
     </nav>
   );
 };
