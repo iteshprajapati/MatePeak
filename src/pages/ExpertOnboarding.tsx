@@ -95,15 +95,24 @@ export default function ExpertOnboarding() {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 py-12 flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-matepeak-primary/5 py-12 flex flex-col items-center px-4">
       <OnboardingHeader />
       
-      <Card className="w-full max-w-2xl shadow-lg bg-white">
-        <CardContent className="p-6">
+      <Card className="w-full max-w-3xl shadow-2xl bg-white border-t-4 border-matepeak-primary animate-fade-in">
+        <CardContent className="p-8">
           <OnboardingProgress currentStep={step} totalSteps={totalSteps} />
           
+          <div className="mt-8 mb-6">
+            <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-matepeak-primary to-[#FFD966] transition-all duration-500 ease-out"
+                style={{ width: `${(step / totalSteps) * 100}%` }}
+              />
+            </div>
+          </div>
+          
           <Form {...form}>
-            <form className="space-y-6">
+            <form className="space-y-8">
               {renderStep()}
               
               <StepNavigation
