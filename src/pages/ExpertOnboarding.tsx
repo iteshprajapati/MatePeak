@@ -4,6 +4,7 @@ import { toast } from "@/components/ui/sonner";
 
 import { Form } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import OnboardingHeader from "@/components/onboarding/OnboardingHeader";
 import BasicInfoStep from "@/components/onboarding/BasicInfoStep";
 import ServiceTypesStep from "@/components/onboarding/ServiceTypesStep";
@@ -111,19 +112,21 @@ export default function ExpertOnboarding() {
             </div>
           </div>
           
-          <Form {...form}>
-            <form className="space-y-8">
-              {renderStep()}
-              
-              <StepNavigation
-                currentStep={step}
-                totalSteps={totalSteps}
-                onBack={handleBack}
-                onNext={handleNext}
-                isSubmitting={isSubmitting}
-              />
-            </form>
-          </Form>
+          <TooltipProvider>
+            <Form {...form}>
+              <form className="space-y-8">
+                {renderStep()}
+                
+                <StepNavigation
+                  currentStep={step}
+                  totalSteps={totalSteps}
+                  onBack={handleBack}
+                  onNext={handleNext}
+                  isSubmitting={isSubmitting}
+                />
+              </form>
+            </Form>
+          </TooltipProvider>
         </CardContent>
       </Card>
     </div>

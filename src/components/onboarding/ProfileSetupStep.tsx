@@ -5,7 +5,6 @@ import { Camera, Linkedin, Twitter, Instagram, User, HelpCircle } from "lucide-r
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
@@ -36,19 +35,18 @@ export default function ProfileSetupStep({ form }: { form: UseFormReturn<any> })
   };
   
   return (
-    <TooltipProvider>
-      <div className="space-y-6 animate-fade-in">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-full bg-matepeak-primary/10 flex items-center justify-center">
-            <User className="w-6 h-6 text-matepeak-primary" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">Profile Setup</h3>
-            <p className="text-gray-600 text-sm">Make your profile stand out with a photo and bio</p>
-          </div>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-full bg-matepeak-primary/10 flex items-center justify-center">
+          <User className="w-6 h-6 text-matepeak-primary" />
         </div>
-        
-        <div className="flex flex-col items-center mb-6 p-6 bg-gradient-to-br from-matepeak-primary/5 to-transparent rounded-lg border-2 border-dashed border-matepeak-primary/20 hover:border-matepeak-primary/40 transition-colors">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900">Profile Setup</h3>
+          <p className="text-gray-600 text-sm">Make your profile stand out with a photo and bio</p>
+        </div>
+      </div>
+      
+      <div className="flex flex-col items-center mb-6 p-6 bg-gradient-to-br from-matepeak-primary/5 to-transparent rounded-lg border-2 border-dashed border-matepeak-primary/20 hover:border-matepeak-primary/40 transition-colors">
         <FormField
           control={form.control}
           name="profilePicture"
@@ -197,6 +195,5 @@ export default function ProfileSetupStep({ form }: { form: UseFormReturn<any> })
         />
       </div>
     </div>
-    </TooltipProvider>
   );
 }
