@@ -7,10 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
+import { GraduationCap, Briefcase, Heart, Code, BookOpen, Palette, TrendingUp, Users } from "lucide-react";
+
+const expertiseOptions = [
+  { value: "Career Coaching", icon: Briefcase, color: "bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-400" },
+  { value: "Academic Support", icon: GraduationCap, color: "bg-purple-50 border-purple-200 hover:bg-purple-100 hover:border-purple-400" },
+  { value: "Mental Health", icon: Heart, color: "bg-pink-50 border-pink-200 hover:bg-pink-100 hover:border-pink-400" },
+  { value: "Programming & Tech", icon: Code, color: "bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-400" },
+  { value: "Test Preparation", icon: BookOpen, color: "bg-orange-50 border-orange-200 hover:bg-orange-100 hover:border-orange-400" },
+  { value: "Creative Arts", icon: Palette, color: "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-400" },
+  { value: "Business & Finance", icon: TrendingUp, color: "bg-emerald-50 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-400" },
+  { value: "Leadership & Development", icon: Users, color: "bg-amber-50 border-amber-200 hover:bg-amber-100 hover:border-amber-400" },
+];
 
 export default function MentorSignup() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedExpertise, setSelectedExpertise] = useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,7 +33,12 @@ export default function MentorSignup() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
-    const expertise = formData.get("expertise") as string;
+    
+    if (!selectedExpertise) {
+      toast.error("Please select your area of expertise");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -29,7 +47,7 @@ export default function MentorSignup() {
         options: {
           data: {
             full_name: fullName,
-            expertise: expertise,
+            expertise: selectedExpertise,
             role: 'mentor'
           }
         },
@@ -109,14 +127,32 @@ export default function MentorSignup() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="expertise">Area of Expertise</Label>
-          <Input
-            id="expertise"
-            name="expertise"
-            type="text"
-            required
-            placeholder="e.g., Career Coaching, Academic Support"
-          />
+          <Label htmlFor="expertise">Select Your Expertise</Label>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {expertiseOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setSelectedExpertise(option.value)}
+                  className={`
+                    flex flex-col items-center gap-2 p-4 rounded-lg border-2 
+                    transition-all duration-200 
+                    ${selectedExpertise === option.value 
+                      ? 'ring-2 ring-matepeak-primary ring-offset-2 border-matepeak-primary bg-matepeak-primary/5' 
+                      : option.color
+                    }
+                  `}
+                >
+                  <Icon className={`h-6 w-6 ${selectedExpertise === option.value ? 'text-matepeak-primary' : 'text-gray-700'}`} />
+                  <span className={`text-sm font-medium text-center ${selectedExpertise === option.value ? 'text-matepeak-primary' : 'text-gray-700'}`}>
+                    {option.value}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>

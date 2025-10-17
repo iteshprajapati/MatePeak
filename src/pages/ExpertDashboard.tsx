@@ -2,8 +2,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Calendar, Users, UserCircle, Gift } from "lucide-react";
+import { Search, Calendar, Users, UserCircle, Gift, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function ExpertDashboard() {
   const navigate = useNavigate();
@@ -18,14 +19,25 @@ export default function ExpertDashboard() {
     checkAuth();
   }, [navigate]);
 
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Signed out successfully");
+      navigate('/');
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign out");
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r">
+      <aside className="w-64 bg-white border-r relative flex flex-col">
         <div className="p-4 border-b">
           <h1 className="text-2xl font-bold text-matepeak-primary">MatePeak</h1>
         </div>
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-2 flex-1">
           <button className="flex items-center gap-3 w-full p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
             <Search className="h-5 w-5" />
             <span>Home</span>
@@ -47,6 +59,15 @@ export default function ExpertDashboard() {
             <span>Rewards</span>
           </button>
         </nav>
+        <div className="p-4 border-t bg-white">
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-3 w-full p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}
