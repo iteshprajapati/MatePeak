@@ -1,6 +1,6 @@
 
 import { UseFormReturn } from "react-hook-form";
-import { Video, MessageSquare, ShoppingBag, FileText, CheckCircle2, Sparkles } from "lucide-react";
+import { Video, MessageSquare, ShoppingBag, FileText, CheckCircle2, Sparkles, Check } from "lucide-react";
 import {
   FormField,
   FormItem,
@@ -8,7 +8,6 @@ import {
   FormControl,
   FormDescription,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const services = [
   {
@@ -88,11 +87,13 @@ export default function ServiceTypesStep({ form }: { form: UseFormReturn<any> })
                       {service.description}
                     </FormDescription>
                   </div>
-                  <Checkbox
-                    checked={field.value || false}
-                    className="mt-1 pointer-events-none"
-                    tabIndex={-1}
-                  />
+                  <div className={`mt-1 h-5 w-5 rounded border-2 flex items-center justify-center transition-colors ${
+                    field.value 
+                      ? 'bg-matepeak-primary border-matepeak-primary' 
+                      : 'border-gray-300 bg-white'
+                  }`}>
+                    {field.value && <Check className="h-3 w-3 text-white" />}
+                  </div>
                 </div>
               </FormItem>
               )}
