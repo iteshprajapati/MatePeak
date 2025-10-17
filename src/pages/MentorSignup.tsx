@@ -23,13 +23,10 @@ export default function MentorSignup() {
     const expertise = formData.get("expertise") as string;
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
             expertise: expertise,
@@ -58,26 +55,12 @@ export default function MentorSignup() {
         return;
       }
 
-      // Check if user is immediately authenticated (email confirmation disabled)
+      // With email confirmation disabled, session should be available immediately
       if (data.session) {
         toast.success("Account created successfully! Redirecting to onboarding...");
         navigate("/expert/onboarding");
-      } else if (data.user) {
-        // Email confirmation is enabled, need to sign in after confirmation
-        toast.success("Account created! Please check your email to confirm, then you can complete onboarding.");
-        
-        // Try to sign in immediately (in case email confirmation is disabled in settings)
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (signInData.session) {
-          navigate("/expert/onboarding");
-        } else {
-          navigate("/expert/login");
-        }
       } else {
+        toast.error("Failed to create session. Please try logging in.");
         navigate("/expert/login");
       }
     } catch (error: any) {
