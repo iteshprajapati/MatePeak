@@ -59,7 +59,8 @@ export default function ServiceTypesStep({ form }: { form: UseFormReturn<any> })
               control={form.control}
               name={service.name}
               render={({ field }) => (
-                <FormItem className="group">
+              <FormItem className="group">
+                <FormControl>
                   <div className={`flex items-start space-x-4 rounded-lg border-2 p-4 transition-all cursor-pointer ${
                     field.value 
                       ? 'border-matepeak-primary bg-matepeak-primary/5 shadow-md' 
@@ -80,15 +81,15 @@ export default function ServiceTypesStep({ form }: { form: UseFormReturn<any> })
                         {service.description}
                       </FormDescription>
                     </div>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="mt-1"
-                      />
-                    </FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="mt-1 pointer-events-none"
+                      tabIndex={-1}
+                    />
                   </div>
-                </FormItem>
+                </FormControl>
+              </FormItem>
               )}
             />
           );
