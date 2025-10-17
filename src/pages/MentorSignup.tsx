@@ -58,11 +58,25 @@ export default function MentorSignup() {
         return;
       }
 
-      toast.success("Account created successfully! Please check your email to confirm your account.");
-      
-      // If user was created successfully, navigate to onboarding flow
-      if (data.user) {
+      // Check if user is immediately authenticated (email confirmation disabled)
+      if (data.session) {
+        toast.success("Account created successfully! Redirecting to onboarding...");
         navigate("/expert/onboarding");
+      } else if (data.user) {
+        // Email confirmation is enabled, need to sign in after confirmation
+        toast.success("Account created! Please check your email to confirm, then you can complete onboarding.");
+        
+        // Try to sign in immediately (in case email confirmation is disabled in settings)
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInData.session) {
+          navigate("/expert/onboarding");
+        } else {
+          navigate("/expert/login");
+        }
       } else {
         navigate("/expert/login");
       }
