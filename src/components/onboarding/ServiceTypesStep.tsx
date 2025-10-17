@@ -60,35 +60,34 @@ export default function ServiceTypesStep({ form }: { form: UseFormReturn<any> })
               name={service.name}
               render={({ field }) => (
               <FormItem className="group">
-                <FormControl>
-                  <div className={`flex items-start space-x-4 rounded-lg border-2 p-4 transition-all cursor-pointer ${
-                    field.value 
-                      ? 'border-matepeak-primary bg-matepeak-primary/5 shadow-md' 
-                      : 'border-gray-200 hover:border-matepeak-primary/50 hover:shadow-sm'
-                  }`}
-                  onClick={() => field.onChange(!field.value)}
-                  >
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                      field.value ? 'bg-matepeak-primary text-white' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {field.value ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <FormLabel className="text-base font-semibold cursor-pointer">
-                        {service.label}
-                      </FormLabel>
-                      <FormDescription className="mt-1 text-sm">
-                        {service.description}
-                      </FormDescription>
-                    </div>
+                <div className={`flex items-start space-x-4 rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                  field.value 
+                    ? 'border-matepeak-primary bg-matepeak-primary/5 shadow-md' 
+                    : 'border-gray-200 hover:border-matepeak-primary/50 hover:shadow-sm'
+                }`}
+                onClick={() => field.onChange(!field.value)}
+                >
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                    field.value ? 'bg-matepeak-primary text-white' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {field.value ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <FormLabel className="text-base font-semibold cursor-pointer">
+                      {service.label}
+                    </FormLabel>
+                    <FormDescription className="mt-1 text-sm">
+                      {service.description}
+                    </FormDescription>
+                  </div>
+                  <FormControl>
                     <Checkbox
                       checked={field.value}
-                      onCheckedChange={field.onChange}
                       className="mt-1 pointer-events-none"
                       tabIndex={-1}
                     />
-                  </div>
-                </FormControl>
+                  </FormControl>
+                </div>
               </FormItem>
               )}
             />
