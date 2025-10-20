@@ -24,14 +24,27 @@ export default function MentorSignup() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedExpertise, setSelectedExpertise] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+    
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+    
     setIsLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
     
     if (!selectedExpertise) {
@@ -162,9 +175,36 @@ export default function MentorSignup() {
             type="password"
             required
             minLength={6}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError("");
+            }}
           />
         </div>
-        <Button className="w-full" type="submit" disabled={isLoading}>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            minLength={6}
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setPasswordError("");
+            }}
+          />
+          {passwordError && (
+            <p className="text-sm text-destructive">{passwordError}</p>
+          )}
+        </div>
+        <Button 
+          className="w-full" 
+          type="submit" 
+          disabled={isLoading || !password || !confirmPassword || password !== confirmPassword || password.length < 6}
+        >
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
