@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import MentorSearch from "./pages/MentorSearch";
 import MentorProfile from "./pages/MentorProfile";
+import MentorProfileByUsername from "./pages/MentorProfileByUsername";
 import BookingPage from "./pages/BookingPage";
 import BookingSuccess from "./pages/BookingSuccess";
 import Dashboard from "./pages/Dashboard";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/mentors" element={<MentorSearch />} />
           <Route path="/mentors/:id" element={<MentorProfile />} />
+          <Route path="/mentor/:username" element={<MentorProfileByUsername />} />
           <Route path="/book/:id" element={<BookingPage />} />
           <Route path="/booking-success" element={<BookingSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />

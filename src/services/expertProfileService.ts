@@ -13,28 +13,60 @@ export async function updateExpertProfile(data: FormValues) {
   // Convert availability array to a JSON string
   const availabilityJson = JSON.stringify(data.availability);
   
-  // Update user profile in database
-  const { error } = await supabase
+  // First, check if profile exists
+  const { data: existingProfile } = await supabase
     .from('expert_profiles')
-    .update({
-      full_name: data.fullName,
-      username: data.username,
-      category: data.category,
-      services: {
-        oneOnOneSession: data.oneOnOneSession,
-        chatAdvice: data.chatAdvice,
-        digitalProducts: data.digitalProducts,
-        notes: data.notes,
-      },
-      availability_json: availabilityJson,
-      ispaid: data.isPaid, // Using lowercase 'ispaid' to match the database column
-      pricing: data.pricePerSession,
-      bio: data.bio,
-      social_links: data.socialLinks,
-    })
-    .eq('id', user.id);
+    .select('id')
+    .eq('id', user.id)
+    .single();
+
+  if (existingProfile) {
+    // Update existing profile
+    const { error } = await supabase
+      .from('expert_profiles')
+      .update({
+        full_name: data.fullName,
+        username: data.username,
+        category: data.category,
+        services: {
+          oneOnOneSession: data.oneOnOneSession,
+          chatAdvice: data.chatAdvice,
+          digitalProducts: data.digitalProducts,
+          notes: data.notes,
+        },
+        availability_json: availabilityJson,
+        ispaid: data.isPaid,
+        pricing: data.pricePerSession,
+        bio: data.bio,
+        social_links: data.socialLinks,
+      })
+      .eq('id', user.id);
+    
+    if (error) throw error;
+  } else {
+    // Insert new profile
+    const { error } = await supabase
+      .from('expert_profiles')
+      .insert({
+        id: user.id,
+        full_name: data.fullName,
+        username: data.username,
+        category: data.category,
+        services: {
+          oneOnOneSession: data.oneOnOneSession,
+          chatAdvice: data.chatAdvice,
+          digitalProducts: data.digitalProducts,
+          notes: data.notes,
+        },
+        availability_json: availabilityJson,
+        ispaid: data.isPaid,
+        pricing: data.pricePerSession,
+        bio: data.bio,
+        social_links: data.socialLinks,
+      });
+    
+    if (error) throw error;
+  }
   
-  if (error) throw error;
-  
-  return { success: true };
+  return { success: true, username: data.username };
 }

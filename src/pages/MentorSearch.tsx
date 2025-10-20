@@ -1,12 +1,16 @@
 
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchFilters from "@/components/SearchFilters";
 import MentorCard from "@/components/MentorCard";
 import { filterMentors } from "@/data/mentors";
 import { MentorProfile } from "@/components/MentorCard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 const MentorSearch = () => {
   const location = useLocation();
@@ -16,11 +20,35 @@ const MentorSearch = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredMentors, setFilteredMentors] = useState<MentorProfile[]>([]);
+  const [dbMentors, setDbMentors] = useState<any[]>([]);
   const [searchFilters, setSearchFilters] = useState({
     searchTerm: initialSearchTerm,
     categories: initialCategory ? [initialCategory] : [],
     priceRange: [0, 2000],
   });
+
+  // Fetch mentors from database
+  useEffect(() => {
+    fetchDatabaseMentors();
+  }, []);
+
+  const fetchDatabaseMentors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("expert_profiles")
+        .select(`
+          *,
+          profiles (
+            avatar_url
+          )
+        `);
+
+      if (error) throw error;
+      setDbMentors(data || []);
+    } catch (error) {
+      console.error("Error fetching mentors:", error);
+    }
+  };
 
   useEffect(() => {
     if (initialSearchTerm) {
@@ -81,13 +109,52 @@ const MentorSearch = () => {
             )}
           </div>
           
-          {filteredMentors.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} />
-              ))}
+          {/* Database Mentors */}
+          {dbMentors.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">New Mentors</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {dbMentors.map((mentor) => (
+                  <Link key={mentor.id} to={`/mentor/${mentor.username}`}>
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col items-center text-center">
+                          <Avatar className="h-20 w-20 mb-4">
+                            <AvatarImage src={mentor.profiles?.avatar_url} alt={mentor.full_name} />
+                            <AvatarFallback className="bg-matepeak-primary text-white text-lg">
+                              {mentor.full_name.split(' ').map((n: string) => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <h3 className="font-bold text-lg mb-1">{mentor.full_name}</h3>
+                          <p className="text-sm text-gray-600 mb-3">@{mentor.username}</p>
+                          <Badge variant="secondary" className="mb-3">
+                            {mentor.category}
+                          </Badge>
+                          <p className="text-sm text-gray-700 line-clamp-2">
+                            {mentor.bio || "No bio available"}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
             </div>
-          ) : (
+          )}
+
+          {/* Static Mentors */}
+          {filteredMentors.length > 0 ? (
+            <div>
+              <h2 className="text-2xl font-bold mb-6">
+                {filteredMentors.length} {filteredMentors.length === 1 ? "Mentor" : "Mentors"} Available
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredMentors.map((mentor) => (
+                  <MentorCard key={mentor.id} mentor={mentor} />
+                ))}
+              </div>
+            </div>
+          ) : !dbMentors.length && (
             <div className="text-center py-16">
               <h3 className="text-xl font-medium mb-2">No mentors found</h3>
               <p className="text-gray-600 mb-4">
