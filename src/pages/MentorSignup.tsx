@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthLayout } from "@/components/AuthLayout";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/sonner";
-import { GraduationCap, Briefcase, Heart, Code, BookOpen, Palette, TrendingUp, Users } from "lucide-react";
+import { GraduationCap, Briefcase, Heart, Code, BookOpen, Palette, TrendingUp, Users, CheckCircle2, XCircle } from "lucide-react";
 
 const expertiseOptions = [
   { value: "Career Coaching", icon: Briefcase, color: "bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-400" },
@@ -27,9 +27,85 @@ export default function MentorSignup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameSuggestions, setUsernameSuggestions] = useState<string[]>([]);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameValid, setUsernameValid] = useState(false);
+
+  const validateUsernameFormat = (value: string): string | null => {
+    if (!value) return "Username is required";
+    if (value.length > 30) return "Username must be less than 30 characters";
+    if (!/^[a-z]/.test(value)) return "Username must start with a letter";
+    if (!/^[a-z0-9._]+$/.test(value)) return "Username can only contain lowercase letters, numbers, periods, and underscores";
+    if (/[._]{2,}/.test(value)) return "Username cannot contain consecutive periods or underscores";
+    return null;
+  };
+
+  const checkUsernameAvailability = async (value: string) => {
+    const formatError = validateUsernameFormat(value);
+    if (formatError) {
+      setUsernameError(formatError);
+      setUsernameValid(false);
+      setUsernameSuggestions([]);
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    try {
+      const { data, error } = await supabase
+        .from("expert_profiles")
+        .select("username")
+        .ilike("username", value)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setUsernameError("Username is already taken");
+        setUsernameValid(false);
+        
+        // Generate suggestions
+        const suggestions = [
+          `${value}_${Math.floor(Math.random() * 1000)}`,
+          `${value}.mentor`,
+          `${value}_expert`
+        ];
+        setUsernameSuggestions(suggestions);
+      } else {
+        setUsernameError("");
+        setUsernameValid(true);
+        setUsernameSuggestions([]);
+      }
+    } catch (error) {
+      console.error("Error checking username:", error);
+    } finally {
+      setIsCheckingUsername(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!username) {
+      setUsernameError("");
+      setUsernameValid(false);
+      setUsernameSuggestions([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      checkUsernameAvailability(username);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [username]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    
+    if (!usernameValid) {
+      toast.error("Please choose a valid and available username");
+      return;
+    }
     
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
@@ -60,6 +136,7 @@ export default function MentorSignup() {
         options: {
           data: {
             full_name: fullName,
+            username: username,
             expertise: selectedExpertise,
             role: 'mentor'
           }
@@ -140,6 +217,53 @@ export default function MentorSignup() {
           />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="username">Username</Label>
+          <div className="relative">
+            <Input
+              id="username"
+              name="username"
+              type="text"
+              required
+              maxLength={30}
+              placeholder="johndoe"
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              className={usernameError ? "border-destructive" : usernameValid ? "border-green-500" : ""}
+            />
+            {isCheckingUsername && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            )}
+            {!isCheckingUsername && username && usernameValid && (
+              <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500" />
+            )}
+            {!isCheckingUsername && username && usernameError && (
+              <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive" />
+            )}
+          </div>
+          {usernameError && (
+            <p className="text-sm text-destructive">{usernameError}</p>
+          )}
+          {usernameSuggestions.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Try these instead:</p>
+              <div className="flex gap-2 flex-wrap">
+                {usernameSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => setUsername(suggestion)}
+                    className="text-sm px-2 py-1 rounded bg-secondary hover:bg-secondary/80 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="expertise">Select Your Expertise</Label>
           <div className="grid grid-cols-2 gap-3 mt-2">
             {expertiseOptions.map((option) => {
@@ -203,7 +327,7 @@ export default function MentorSignup() {
         <Button 
           className="w-full" 
           type="submit" 
-          disabled={isLoading || !password || !confirmPassword || password !== confirmPassword || password.length < 6}
+          disabled={isLoading || !usernameValid || !password || !confirmPassword || password !== confirmPassword || password.length < 6 || isCheckingUsername}
         >
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
