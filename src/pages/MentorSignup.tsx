@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -188,13 +187,19 @@ export default function MentorSignup() {
   }
 
   return (
-    <AuthLayout
-      title="Create a Mentor Account"
-      description="Share your expertise and help students succeed"
-      footer="Already have an account?"
-      footerLink="/expert/login"
-      footerLinkText="Sign in"
-    >
+    <div className="min-h-screen bg-gradient-to-br from-matepeak-primary via-matepeak-secondary to-matepeak-primary flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl p-8">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block mb-4">
+            <img 
+              src="/lovable-uploads/14bf0eea-1bc9-4675-9231-356df10eb82d.png" 
+              alt="MatePeak Logo"
+              className="h-12 mx-auto"
+            />
+          </Link>
+          <h2 className="text-2xl font-bold text-gray-900">Create a Mentor Account</h2>
+          <p className="text-gray-600 mt-2">Share your expertise and help students succeed</p>
+        </div>
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="fullName">Full Name</Label>
@@ -325,19 +330,28 @@ export default function MentorSignup() {
           )}
         </div>
         <Button 
-          className="w-full" 
+          className="w-full bg-matepeak-primary hover:bg-matepeak-secondary" 
           type="submit" 
           disabled={isLoading || !usernameValid || !password || !confirmPassword || password !== confirmPassword || password.length < 6 || isCheckingUsername}
         >
           {isLoading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
+
+      <p className="text-center mt-6 text-sm text-gray-600">
+        Already have an account?{" "}
+        <Link to="/expert/login" className="text-matepeak-primary hover:underline font-medium">
+          Sign in
+        </Link>
+      </p>
+
       <p className="text-center mt-4 text-sm text-gray-600">
         Want to join as a student?{" "}
-        <a href="/student/signup" className="text-matepeak-primary hover:underline font-medium">
+        <Link to="/student/signup" className="text-matepeak-primary hover:underline font-medium">
           Sign up as student
-        </a>
+        </Link>
       </p>
-    </AuthLayout>
+    </div>
+  </div>
   );
 }

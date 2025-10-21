@@ -99,6 +99,12 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Global placeholder styling */
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 0.5;
+  }
 }
 
 @layer components {
