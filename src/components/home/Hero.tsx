@@ -22,8 +22,8 @@ const Hero = () => {
               Get the cheat codes from the pros
             </span>
           </h1>
-          <p className="text-xl text-gray-700 mb-8">
-            No fluff. Just <span className="text-[#FFD966] font-medium">real lessons</span> from real people.
+          <p className="text-xl text-gray-600 mb-8 font-poppins font-light">
+            No fluff. Just <span className="text-amber-500 font-normal">real lessons</span> from real people.
           </p>
           
           <AnimatedSearchBar />

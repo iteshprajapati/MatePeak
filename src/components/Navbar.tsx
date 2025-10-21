@@ -113,7 +113,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-matepeak-primary py-4 shadow-sm">
+    <>
+    <nav className="bg-white py-4 shadow-sm border-b border-gray-200">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <img 
@@ -121,7 +122,7 @@ const Navbar = () => {
             alt="MatePeak Logo"
             className="h-8 mr-2"
           />
-          <span className="text-2xl font-bold font-poppins text-white">MatePeak</span>
+          <span className="text-2xl font-bold font-poppins text-matepeak-primary">MatePeak</span>
         </Link>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -164,13 +165,13 @@ const Navbar = () => {
             <>
               <Button 
                 variant="ghost"
-                className="text-white hover:text-[#FFD966] hover:bg-white/10 font-medium"
+                className="text-matepeak-primary hover:text-matepeak-secondary hover:bg-gray-100 font-medium"
                 onClick={handleSignInClick}
               >
                 Sign In
               </Button>
               <Button 
-                className="bg-white text-matepeak-primary hover:bg-[#FFD966] font-bold rounded-lg transition-colors duration-300"
+                className="bg-matepeak-primary text-white hover:bg-matepeak-secondary font-bold rounded-lg transition-colors duration-300"
                 onClick={handleGetStartedClick}
               >
                 Get Started
@@ -182,7 +183,7 @@ const Navbar = () => {
         <div className="md:hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white hover:text-[#FFD966]"
+            className="text-matepeak-primary hover:text-matepeak-secondary"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -190,10 +191,10 @@ const Navbar = () => {
       </div>
 
       {isMenuOpen && (
-        <div className="md:hidden bg-matepeak-primary py-4 px-4 mt-2 shadow-inner">
+        <div className="md:hidden bg-white py-4 px-4 mt-2 shadow-inner border-t border-gray-200">
           {user ? (
             <div className="flex flex-col space-y-3">
-              <div className="flex items-center gap-3 pb-3 border-b border-white/20">
+              <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || user.email} />
                   <AvatarFallback className={`${getAvatarColor(profile?.full_name || user.email)} text-white`}>
@@ -201,13 +202,13 @@ const Navbar = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-white font-medium text-sm">{profile?.full_name || 'User'}</p>
-                  <p className="text-white/70 text-xs">{user.email}</p>
+                  <p className="text-matepeak-primary font-medium text-sm">{profile?.full_name || 'User'}</p>
+                  <p className="text-gray-600 text-xs">{user.email}</p>
                 </div>
               </div>
               <Button 
                 variant="ghost"
-                className="text-white hover:text-[#FFD966] hover:bg-white/10 w-full font-medium justify-start"
+                className="text-matepeak-primary hover:text-matepeak-secondary hover:bg-gray-100 w-full font-medium justify-start"
                 onClick={() => {
                   handleViewProfile();
                   setIsMenuOpen(false);
@@ -218,7 +219,7 @@ const Navbar = () => {
               </Button>
               <Button 
                 variant="ghost"
-                className="text-white hover:text-[#FFD966] hover:bg-white/10 w-full font-medium justify-start"
+                className="text-matepeak-primary hover:text-matepeak-secondary hover:bg-gray-100 w-full font-medium justify-start"
                 onClick={() => {
                   navigate('/dashboard');
                   setIsMenuOpen(false);
@@ -229,7 +230,7 @@ const Navbar = () => {
               </Button>
               <Button 
                 variant="ghost"
-                className="text-white hover:text-[#FFD966] hover:bg-white/10 w-full font-medium justify-start"
+                className="text-matepeak-primary hover:text-matepeak-secondary hover:bg-gray-100 w-full font-medium justify-start"
                 onClick={() => {
                   handleLogout();
                   setIsMenuOpen(false);
@@ -243,7 +244,7 @@ const Navbar = () => {
             <div className="flex flex-col space-y-3">
               <Button 
                 variant="ghost"
-                className="text-white hover:text-[#FFD966] hover:bg-white/10 w-full font-medium justify-start"
+                className="text-matepeak-primary hover:text-matepeak-secondary hover:bg-gray-100 w-full font-medium justify-start"
                 onClick={() => {
                   handleSignInClick();
                   setIsMenuOpen(false);
@@ -252,7 +253,7 @@ const Navbar = () => {
                 Sign In
               </Button>
               <Button 
-                className="bg-white text-matepeak-primary hover:bg-gray-100 w-full font-bold rounded-lg"
+                className="bg-matepeak-primary text-white hover:bg-matepeak-secondary w-full font-bold rounded-lg"
                 onClick={() => {
                   handleGetStartedClick();
                   setIsMenuOpen(false);
@@ -270,6 +271,7 @@ const Navbar = () => {
         onOpenChange={setIsRoleModalOpen} 
       />
     </nav>
+    </>
   );
 };
 
