@@ -36,12 +36,19 @@ const StudentSignup = () => {
 
       if (error) throw error;
 
-      if (data?.user) {
+      // With email confirmation disabled, session should be available immediately
+      if (data.session) {
+        toast({
+          title: "Account created!",
+          description: "Welcome to MatePeak!",
+        });
+        navigate("/");
+      } else {
         toast({
           title: "Account created!",
           description: "Please check your email to verify your account.",
         });
-        navigate("/");
+        navigate("/expert/login");
       }
     } catch (error: any) {
       toast({
